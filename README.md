@@ -4,11 +4,11 @@ Add tags from explorer context menu. Can scan "neighbours" and use their tags.
 
 Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
-## Installation
-
 ![Context Menu Example](images/ContextMenu.png)
 
 ![Main Window Example](images/Window.png)
+
+## Installation
 
 Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
 
