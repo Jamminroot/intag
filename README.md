@@ -6,9 +6,9 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
 ## Installation
 
-![Context Menu Example](.\images\ContextMenu.png)
+![Context Menu Example](images/ContextMenu.png)
 
-![Main Window Example](.\images\Window.png)
+![Main Window Example](images/Window.png)
 
 Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
 
