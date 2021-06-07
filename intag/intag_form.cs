@@ -37,8 +37,8 @@ FolderType=Generic
 			
 			var newButton = new RoundedButton
 			{
-				Text = tag, Location = new Point(10 + (index % 2) * 120, 110 + (( index -1 ) / 2 -1 ) * 23), Size = new Size(115, 20),
-				Font = new Font("Calibri", 8.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
+				Text = tag, Location = new Point(10 + (index % 2) * 120, 105 + (( index -1 ) / 2 -1 ) * 25), Size = new Size(115, 23),
+				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
 				ForeColor = Color.FromArgb(255, 231, 143),
 			};
 			newButton.Click += (sender, args) =>
@@ -62,7 +62,7 @@ FolderType=Generic
 				tagIndex++;
 				AddTagButton(tagIndex, tag);
 			}
-			this.Height += 25 * (tagIndex / 2);
+			this.Height += 25 * ((tagIndex + 1) / 2);
 			_filePath = Path.Combine(path, "Desktop.ini");
 			_oldTag = GetFolderTag(_filePath);
 			tagInputBox.Text = _oldTag;
