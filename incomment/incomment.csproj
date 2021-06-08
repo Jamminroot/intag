@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{60BCA8D2-FF4B-4D4A-8CA8-4D1FF7D21CD6}</ProjectGuid>
+    <ProjectGuid>{C25A6FC0-53A8-4B95-A332-7D5AA3CC8EB1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>intag</RootNamespace>
-    <AssemblyName>intag</AssemblyName>
+    <RootNamespace>incomment</RootNamespace>
+    <AssemblyName>incomment</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -27,6 +27,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -87,9 +88,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\IniUtils.cs">
-      <Link>IniUtils.cs</Link>
-    </Compile>
     <Compile Include="..\intag_form.cs">
       <Link>intag_form.cs</Link>
     </Compile>
@@ -103,6 +101,7 @@
       <Link>SharedConstants.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="IniUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\Windows\Forms\RoundedButton.cs">
       <SubType>Component</SubType>
@@ -123,15 +122,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="Properties\app.manifest" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

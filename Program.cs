@@ -17,7 +17,7 @@ namespace intag
             }
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new IntagForm(args[0]));
+            Application.Run(new MainForm(args[0]));
         }
     }
 }
