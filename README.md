@@ -10,9 +10,14 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
 ## Installation
 
-Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
+### Via argument
 
-Add registry entry (don't forget to fix your path):
+Run exe with `install` arguement
+
+### Manually
+
+Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
+Alternativelyyou add registry entry (don't forget to fix your path):
 
 in `HKEY_CLASSES_ROOT\Folder\shell\InTag\command`, replace Default in with `C:\\<PUT YOUR PATH HERE>\\intag.exe %1`
 
@@ -24,3 +29,13 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Folder\shell\InTag\command]
 @="C:\\<PUT YOUR PATH HERE>\\intag.exe %1"
 ```
+
+## Uninstall
+
+### Via argument
+
+Run exe with `uninstall` argument
+
+### Manually
+
+Remove `HKEY_CLASSES_ROOT\Folder\shell\InTag` entry
