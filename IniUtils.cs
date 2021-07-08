@@ -9,7 +9,6 @@ namespace intag
 {
 	public static class IniUtils
 	{
-
 		public static void AssignPropertyToFolder(string folder, string propertyValue, string oldPropertyValue)
 		{
 			if (string.IsNullOrWhiteSpace(propertyValue) && propertyValue == oldPropertyValue) { return; }
@@ -25,7 +24,7 @@ namespace intag
 				try { File.Copy(tempFile, desktopIniFilepath, true); }
 				catch (UnauthorizedAccessException)
 				{
-					//ignore - idk tf is that, but that fixes it?..
+					//ignore - idk tf is it thrown, while we do get access later on 
 				}
 				return;
 			}

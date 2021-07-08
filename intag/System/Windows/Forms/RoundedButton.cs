@@ -29,7 +29,7 @@ namespace System.Windows.Forms
             using (var graphPath = GetRoundPath(rect, 8))
             {
                 this.Region = new Region(graphPath);
-                using (var pen = new Pen(Color.FromArgb(255, 231, 143), 2.25f))
+                using (var pen = new Pen(Color.FromArgb(255, 231, 143), 1.55f))
                 {
                     pen.Alignment = PenAlignment.Inset;
                     e.Graphics.DrawPath(pen, graphPath);

@@ -10,7 +10,6 @@ namespace intag
 {
 	public static class IniUtils
 	{
-
 		public static void AssignPropertyToFolder(string folder, string propertyValue, string oldPropertyValue)
 		{
 			if (string.IsNullOrWhiteSpace(propertyValue) && propertyValue == oldPropertyValue) { return; }

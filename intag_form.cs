@@ -31,7 +31,7 @@ namespace intag
 				tagIndex++;
 				AddDynamicButton(tagIndex, nearbyValue);
 			}
-			Height += 25 * ((tagIndex + 1) / 2);
+			Height += 25 * ((tagIndex - 1) / 2);
 			propertyInputBox.Text = _oldValue;
 		}
 
@@ -52,11 +52,17 @@ namespace intag
 
 		private void AddDynamicButton(int index, string value)
 		{
-			var newButton = new RoundedButton
+			var newButton = new Button
 			{
 				Text = value,
-				Location = new Point(10 + index % 2 * 120, 105 + ((index - 1) / 2 - 1) * 25),
+				Location = new Point(10 + index % 2 * 120, 80 + ((index - 1) / 2 - 1) * 25),
 				Size = new Size(115, 23),
+				TabStop = false,
+				FlatStyle = FlatStyle.Flat,
+				FlatAppearance =
+				{
+					BorderSize = 0
+				},
 				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
 				ForeColor = Color.FromArgb(255, 231, 143),
 			};
@@ -68,18 +74,6 @@ namespace intag
 			};
 			Controls.Add(newButton);
 		}
-
-		private void CancelClick(object sender, EventArgs e)
-		{
-			Environment.Exit(1);
-		}
-
-		private void OkClick(object sender, EventArgs e)
-		{
-			IniUtils.AssignPropertyToFolder(_folder, propertyInputBox.Text, _oldValue);
-			Environment.Exit(0);
-		}
-
 		private void FormDeactivate(object sender, EventArgs e)
 		{
 			Environment.Exit(1);
@@ -102,9 +96,15 @@ namespace intag
 
 		private void PropertyInputBoxKeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode != Keys.Enter) return;
-			IniUtils.AssignPropertyToFolder(_folder, propertyInputBox.Text, _oldValue);
-			Environment.Exit(0);
+			if (e.KeyCode == Keys.Enter)
+			{
+				IniUtils.AssignPropertyToFolder(_folder, propertyInputBox.Text, _oldValue);
+				Environment.Exit(0);
+			}
+			if (e.KeyCode == Keys.Escape)
+			{
+				Environment.Exit(0);
+			}
 		}
 	}
 }
