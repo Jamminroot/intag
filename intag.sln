@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "intag", "intag\intag.csproj", "{60BCA8D2-FF4B-4D4A-8CA8-4D1FF7D21CD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "incomment", "incomment\incomment.csproj", "{C25A6FC0-53A8-4B95-A332-7D5AA3CC8EB1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{60BCA8D2-FF4B-4D4A-8CA8-4D1FF7D21CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60BCA8D2-FF4B-4D4A-8CA8-4D1FF7D21CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60BCA8D2-FF4B-4D4A-8CA8-4D1FF7D21CD6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C25A6FC0-53A8-4B95-A332-7D5AA3CC8EB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C25A6FC0-53A8-4B95-A332-7D5AA3CC8EB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C25A6FC0-53A8-4B95-A332-7D5AA3CC8EB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C25A6FC0-53A8-4B95-A332-7D5AA3CC8EB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
