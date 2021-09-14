@@ -29,6 +29,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <AssemblyOriginatorKeyFile>jmrt_intag.snk</AssemblyOriginatorKeyFile>
     <PublicSign>true</PublicSign>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -112,6 +113,7 @@
     <Compile Include="System\Windows\Forms\RoundedTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="System\Windows\Forms\SwitchButton.cs" />
     <EmbeddedResource Include="..\intag_form.resx">
       <Link>intag_form.resx</Link>
     </EmbeddedResource>

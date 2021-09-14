@@ -33,6 +33,7 @@ namespace intag
         {
             this.directoryName = new System.Windows.Forms.Label();
             this.propertyInputBox = new System.Windows.Forms.RoundedTextBox();
+            this.okButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
 
             // 
@@ -54,18 +55,34 @@ namespace intag
             this.propertyInputBox.Location = new System.Drawing.Point(10, 25);
             this.propertyInputBox.MaxLength = 64;
             this.propertyInputBox.Name = "propertyInputBox";
-            this.propertyInputBox.Size = new System.Drawing.Size(234, 21);
+            this.propertyInputBox.Size = new System.Drawing.Size(185, 21);
             this.propertyInputBox.TabIndex = 0;
             this.propertyInputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PropertyInputBoxKeyDown);
+
+            // 
+            // okButton
+            // 
+            this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.okButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
+            this.okButton.ForeColor = System.Drawing.SystemColors.Info;
+            this.okButton.Location = new System.Drawing.Point(201, 25);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(43, 21);
+            this.okButton.TabIndex = 5;
+            this.okButton.Text = "OK";
+            this.okButton.UseVisualStyleBackColor = true;
+            this.okButton.Click += new System.EventHandler(this.okButton_Click);
 
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (46)))), ((int) (((byte) (46)))), ((int) (((byte) (46)))));
             this.ClientSize = new System.Drawing.Size(256, 87);
             this.ControlBox = false;
+            this.Controls.Add(this.okButton);
             this.Controls.Add(this.propertyInputBox);
             this.Controls.Add(this.directoryName);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -82,6 +99,8 @@ namespace intag
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.Button okButton;
 
         #endregion
 

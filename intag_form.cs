@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security;
-using System.Security.Permissions;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace intag
@@ -15,26 +13,34 @@ namespace intag
 	{
 		private const int WmNclbuttondown = 0xA1;
 		private const int HtCaption = 0x2;
+		private static HashSet<string> _selectedTags;
 		private static string _folder;
-		private static string _oldValue;
-
+		private static List<string> _tagsOfParentFolder;
+		private int _baseHeight;
 		public MainForm(string path)
 		{
-			InitializeComponent();
 			_folder = path;
-			directoryName.Text = _folder;
-			_oldValue = IniUtils.GetFolderProperties(Path.Combine(_folder, "Desktop.ini"));
-			var nearbyValues = IniUtils.GetNearbyPropertiesValues(path);
+			InitializeComponent();
+			directoryName.Text = path;
+			var desktopIniPath = Path.Combine(path, Constants.DesktopIni);
+			_selectedTags = IniUtils.GetFolderProperties(desktopIniPath);
+			_tagsOfParentFolder = IniUtils.GetNearbyPropertiesValues(path);
 			var tagIndex = 0;
-			foreach (var nearbyValue in nearbyValues)
+			foreach (var tagOfParent in _tagsOfParentFolder)
 			{
 				tagIndex++;
-				AddDynamicButton(tagIndex, nearbyValue);
+				AddDynamicButton(tagIndex, tagOfParent);
 			}
-			Height += 25 * ((tagIndex - 1) / 2);
-			propertyInputBox.Text = _oldValue;
+			ResizeRedraw = true;
+			AdjustForHeight();
 		}
 
+		private void AdjustForHeight()
+		{
+			Height = 87 + 25 * (_tagsOfParentFolder.Count / 2 + 2);
+			Refresh();
+		}
+		
 		protected override void OnCreateControl()
 		{
 			base.OnCreateControl();
@@ -52,7 +58,7 @@ namespace intag
 
 		private void AddDynamicButton(int index, string value)
 		{
-			var newButton = new Button
+			var newButton = new SwitchButton
 			{
 				Text = value,
 				Location = new Point(10 + index % 2 * 120, 80 + ((index - 1) / 2 - 1) * 25),
@@ -64,13 +70,24 @@ namespace intag
 					BorderSize = 0
 				},
 				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
-				ForeColor = Color.FromArgb(255, 231, 143),
+				ForeColor =_selectedTags.Contains(value) ? Color.FromArgb(255, 231, 143) : Color.FromArgb(200,180, 180),
 			};
 			newButton.Click += (sender, args) =>
 			{
-				propertyInputBox.Text = value;
-				IniUtils.AssignPropertyToFolder(_folder, value, _oldValue);
-				Environment.Exit(0);
+				Debug.WriteLine($"Clicked on a button: {value}");
+				//propertyInputBox.Text = value;
+				if (_selectedTags.Contains(value))
+				{
+					_selectedTags.Remove(value);
+				}
+				else
+				{
+					_selectedTags.Add(value);
+				}
+				newButton.ForeColor = _selectedTags.Contains(value) ? Color.FromArgb(255, 231, 143) : Color.FromArgb(200, 180, 180);
+
+				//IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
+				//Environment.Exit(0);
 			};
 			Controls.Add(newButton);
 		}
@@ -98,13 +115,32 @@ namespace intag
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				IniUtils.AssignPropertyToFolder(_folder, propertyInputBox.Text, _oldValue);
-				Environment.Exit(0);
+				var tag = propertyInputBox.Text;
+				if (!_tagsOfParentFolder.Contains(tag))
+				{
+					Debug.WriteLine($"Adding new tag {tag}");
+					_tagsOfParentFolder.Add(tag);
+					_selectedTags.Add(tag);
+					AddDynamicButton(_tagsOfParentFolder.Count, tag);
+				}
+				if (_selectedTags.Contains(tag) || _tagsOfParentFolder.Contains(tag))
+				{
+					propertyInputBox.Text = "";
+				}
+				
+				//IniUtils.AssignPropertyToFolder(_folder, propertyInputBox.Text, _oldSetOfTagsAsString);
+				//Environment.Exit(0);
 			}
 			if (e.KeyCode == Keys.Escape)
 			{
 				Environment.Exit(0);
 			}
+		}
+
+		private void okButton_Click(object sender, EventArgs e)
+		{
+			IniUtils.AssignPropertyToFolder(_folder, _selectedTags);
+			Environment.Exit(0);
 		}
 	}
 }
