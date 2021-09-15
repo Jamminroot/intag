@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security;
 using System.Security.Permissions;
 using System.Text.RegularExpressions;
 
@@ -13,43 +12,21 @@ namespace intag
 		public static void AssignPropertyToFolder(string folder, HashSet<string> propertyValue)
 		{
 			var desktopIniFilepath = Path.Combine(folder, Constants.DesktopIni);
-			var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".intag");
 			var contents = PrepareContentsForFolder(folder, string.Join(";", propertyValue));
-			var desktopIniExists = File.Exists(desktopIniFilepath);
+			
+			var fi = new FileInfo(desktopIniFilepath);
 			var f = new FileIOPermission(FileIOPermissionAccess.AllAccess, desktopIniFilepath);
 			f.AddPathList(FileIOPermissionAccess.AllAccess, new FileInfo(desktopIniFilepath).DirectoryName);
-			File.WriteAllText(tempFile, contents);
-			if (!desktopIniExists)
+			if (File.Exists(desktopIniFilepath))
 			{
-				try { File.Copy(tempFile, desktopIniFilepath, true); }
-				catch (UnauthorizedAccessException)
-				{
-					//ignore - idk tf is it thrown, while we do get access later on 
-				}
-				return;
+				fi.IsReadOnly = false;
 			}
-			try
-			{
-				f.Demand();
-				var fi = new FileInfo(desktopIniFilepath);
-				var wasHidden = (fi.Attributes & FileAttributes.Hidden) > 0;
-				var wasSystem = (fi.Attributes & FileAttributes.System) > 0;
-				var wasReadonly = fi.IsReadOnly;
-				if (File.Exists(desktopIniFilepath))
-				{
-					fi.IsReadOnly = false;
-					fi.Attributes ^= FileAttributes.Hidden | FileAttributes.System;
-				}
-				try { File.Copy(tempFile, desktopIniFilepath, true); }
-				catch (UnauthorizedAccessException)
-				{
-					//ignore - idk tf is that, but that fixes it?..
-				}
-				if (wasHidden) { fi.Attributes |= FileAttributes.Hidden; }
-				if (wasSystem) { fi.Attributes |= FileAttributes.System; }
-				if (wasReadonly) { fi.IsReadOnly = true; }
-			}
-			catch (SecurityException) { }
+			f.Demand();
+			fi.Attributes ^= FileAttributes.Hidden | FileAttributes.System;
+			File.WriteAllText(desktopIniFilepath, contents);
+			fi.Attributes |= FileAttributes.Hidden;
+			fi.Attributes |= FileAttributes.System;
+			fi.IsReadOnly = true;                  
 		}
 
 		public static HashSet<string> GetFolderProperties(string path)
