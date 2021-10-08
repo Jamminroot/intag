@@ -22,7 +22,7 @@ namespace intag
 				fi.IsReadOnly = false;
 			}
 			f.Demand();
-			fi.Attributes ^= FileAttributes.Hidden | FileAttributes.System;
+			if (fi.Exists) fi.Attributes ^= FileAttributes.Hidden | FileAttributes.System;
 			File.WriteAllText(desktopIniFilepath, contents);
 			fi.Attributes |= FileAttributes.Hidden;
 			fi.Attributes |= FileAttributes.System;

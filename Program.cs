@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace intag
@@ -24,6 +25,10 @@ namespace intag
             {
                 RegUtils.Uninstall();
                 Environment.Exit(0);
+            }
+            if (!Directory.Exists(args[0]))
+            {
+                Environment.Exit(1);
             }
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
