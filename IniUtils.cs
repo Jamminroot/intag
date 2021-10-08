@@ -77,18 +77,6 @@ namespace intag
 		private static string PrepareContentsForFolder(string folder, string propertyValue)
 		{
 			return Constants.EmptyDesktopIniTemplate + propertyValue;
-			var desktopIniFilepath = Path.Combine(folder, Constants.DesktopIni);
-			if (!File.Exists(desktopIniFilepath) || string.IsNullOrWhiteSpace(File.ReadAllText(desktopIniFilepath))) ;
-			var lines = new List<string>(File.ReadAllLines(desktopIniFilepath));
-			var indexOfSection = -1;
-			indexOfSection = lines.FindIndex(s => s.Contains(Constants.MagicGuid));
-			if (indexOfSection < 0) return string.Join("\n", lines) + Constants.MagicSectionTemplate + propertyValue;
-			var propertyIndex = lines.FindIndex(indexOfSection, s => s.ToLower().TrimStart().StartsWith(Constants.MagicPropertyName.ToLower()));
-			if (propertyIndex >= 0) return lines[propertyIndex] = Constants.MagicPropertyTemplate + propertyValue;
-
-			// prop not found
-			lines.Insert(indexOfSection + 1, Constants.MagicSectionTemplate + propertyValue);
-			return string.Join("\n", lines);
 		}
 	}
 }
