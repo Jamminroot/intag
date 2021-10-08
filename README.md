@@ -1,5 +1,11 @@
 # InTag
 
+> **To organize things even better** check out my other tool I've been developing. It's actually quite good :)
+> 
+> [GitHub project](https://github.com/Jamminroot/multistack_launcher)
+
+> **SUGGESTIONS ARE WELOME, SO ARE DONATIONS**, as they both boost my motivattion to improve those tools :+1:
+
 Add tags from explorer context menu. Can scan "neighbours" and use their tags. 
 
 Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
@@ -7,6 +13,8 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 ![Context Menu Example](images/ContextMenu.png)
 
 ![Main Window Example](images/Window.png)
+
+![Tagged Folders Example](images/Result.png)
 
 ## Installation
 
