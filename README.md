@@ -19,12 +19,18 @@ Run exe with `install` arguement
 Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
 Alternativelyyou add registry entry (don't forget to fix your path):
 
+> **NOTE**: This does not include icon. For icon refer to the code below
+
 in `HKEY_CLASSES_ROOT\Folder\shell\InTag\command`, replace Default in with `C:\\<PUT YOUR PATH HERE>\\intag.exe %1`
+
 
 Or just run this regedit (also included as a reg, but again - don't forget to fix path):
 
 ```reg
 Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\Folder\shell\InTag]
+"Icon"="C:\\<PUT YOUR PATH HERE>\\intag.exe"
 
 [HKEY_CLASSES_ROOT\Folder\shell\InTag\command]
 @="C:\\<PUT YOUR PATH HERE>\\intag.exe %1"
