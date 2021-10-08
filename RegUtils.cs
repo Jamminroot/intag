@@ -8,17 +8,28 @@ namespace intag
 	{
 		public static void Install()
 		{
+			var subKeyIcon = Registry.ClassesRoot.CreateSubKey($@"Folder\shell\{Constants.RegistryName}");
+			if (subKeyIcon == null)
+			{
+				return;
+			}
+			
 			var subKey = Registry.ClassesRoot.CreateSubKey($@"Folder\shell\{Constants.RegistryName}\command");
 			if (subKey == null)
 			{
 				return;
 			}
+			
 			var loc = Assembly.GetEntryAssembly()?.Location;
 			if (loc == null)
 			{
 				subKey.Close();
 				Environment.Exit(1);
 			}
+			
+			
+			subKeyIcon.SetValue("Icon", loc);
+			subKeyIcon.Close();
 			subKey.SetValue("", loc+" %1");
 			subKey.Close();  
 		}
