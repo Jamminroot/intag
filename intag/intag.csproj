@@ -91,24 +91,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\IniUtils.cs">
+    <Compile Include="IniUtils.cs">
       <Link>IniUtils.cs</Link>
     </Compile>
-    <Compile Include="..\intag_form.cs">
-      <Link>intag_form.cs</Link>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\intag_form.Designer.cs">
+    <Compile Include="intag_form.cs" />
+    <Compile Include="intag_form.Designer.cs">
       <Link>intag_form.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\Program.cs">
+    <Compile Include="Program.cs">
       <Link>Program.cs</Link>
     </Compile>
-    <Compile Include="..\RegUtils.cs">
+    <Compile Include="RegUtils.cs">
       <Link>RegUtils.cs</Link>
-    </Compile>
-    <Compile Include="..\SharedConstants.cs">
-      <Link>SharedConstants.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,7 +115,7 @@
     <Compile Include="System\Windows\Forms\SwitchButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <EmbeddedResource Include="..\intag_form.resx">
+    <EmbeddedResource Include="intag_form.resx">
       <Link>intag_form.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -16,7 +15,6 @@ namespace intag
 		private static HashSet<string> _selectedTags;
 		private static string _folder;
 		private static List<string> _tagsOfParentFolder;
-		private int _baseHeight;
 		public MainForm(string path)
 		{
 			_folder = path;
