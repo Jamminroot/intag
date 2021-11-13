@@ -63,13 +63,13 @@ namespace intag
             // addButton
             // 
             this.addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.addButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
+            this.addButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
             this.addButton.ForeColor = System.Drawing.SystemColors.Info;
             this.addButton.Location = new System.Drawing.Point(201, 25);
             this.addButton.Name = "addButton";
             this.addButton.Size = new System.Drawing.Size(43, 21);
             this.addButton.TabIndex = 5;
-            this.addButton.Text = "+";
+            this.addButton.Text = "NEW";
             this.addButton.UseVisualStyleBackColor = true;
             this.addButton.Click += new System.EventHandler(this.addButton_Click);
 

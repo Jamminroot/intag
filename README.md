@@ -16,6 +16,13 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
 ![Tagged Folders Example](images/Result.png)
 
+## Usage
+
+* After the tool is installed, right-click the folder (for Windows 11, you'd have to press 'Show more options'), select InTag.
+* Assign tags you want to a folder. Neighboring tags are included to list of available for convenience.
+* Once done, just click back to the folder or press esc, tags would be assigned. Note that it takes some time for explorer to detect those changes.
+* If you haven't yet, make sure to enable grouping by tags (Context menu on the folder background > group by > More... > Select 'Tags' in a list, and use it a as a grouping criteria).
+
 ## Installation
 
 ### Via argument
