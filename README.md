@@ -20,7 +20,7 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
 ### Via argument
 
-Run exe with `install` arguement
+Run exe with `--install` or `-i` arguement
 
 ### Manually
 
@@ -29,7 +29,9 @@ Alternativelyyou add registry entry (don't forget to fix your path):
 
 > **NOTE**: This does not include icon. For icon refer to the code below
 
-in `HKEY_CLASSES_ROOT\Folder\shell\InTag\command`, replace Default in with `C:\\<PUT YOUR PATH HERE>\\intag.exe %1`
+in `HKEY_CLASSES_ROOT\Folder\shell\InTag\command`, replace Default in with `"C:\\<PUT YOUR PATH HERE>\\intag.exe" "%1"`
+
+> **NOTE**: Notice double quotes, that is necessary for paths with spaces to work.
 
 
 Or just run this regedit (also included as a reg, but again - don't forget to fix path):
@@ -38,17 +40,17 @@ Or just run this regedit (also included as a reg, but again - don't forget to fi
 Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\Folder\shell\InTag]
-"Icon"="C:\\<PUT YOUR PATH HERE>\\intag.exe"
+"Icon"="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\""
 
 [HKEY_CLASSES_ROOT\Folder\shell\InTag\command]
-@="C:\\<PUT YOUR PATH HERE>\\intag.exe %1"
+@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" \"%1\""
 ```
 
 ## Uninstall
 
 ### Via argument
 
-Run exe with `uninstall` argument
+Run exe with `--uninstall` or `-u` argument
 
 ### Manually
 

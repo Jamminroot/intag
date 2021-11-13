@@ -26,11 +26,12 @@ namespace intag
 				subKey.Close();
 				Environment.Exit(1);
 			}
-			
+
+			loc = $"\"{loc}\"";
 			
 			subKeyIcon.SetValue("Icon", loc);
 			subKeyIcon.Close();
-			subKey.SetValue("", loc+" %1");
+			subKey.SetValue("", loc+" \"%1\"");
 			subKey.Close();  
 		}
 

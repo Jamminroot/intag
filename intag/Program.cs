@@ -16,12 +16,12 @@ namespace intag
             {
                 Environment.Exit(1);
             }
-            if (args.Length == 1 && args[0].Equals("install", StringComparison.CurrentCultureIgnoreCase))
+            if (args.Length == 1 && (args[0].Equals("--install", StringComparison.CurrentCultureIgnoreCase) || args[0].Equals("-i", StringComparison.CurrentCultureIgnoreCase) ))
             {
                 RegUtils.Install();
                 Environment.Exit(0);
             }
-            if (args.Length == 1 && args[0].Equals("uninstall", StringComparison.CurrentCultureIgnoreCase))
+            if (args.Length == 1 && (args[0].Equals("--uninstall", StringComparison.CurrentCultureIgnoreCase) || args[0].Equals("-u", StringComparison.CurrentCultureIgnoreCase)))
             {
                 RegUtils.Uninstall();
                 Environment.Exit(0);

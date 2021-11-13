@@ -13,8 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <AssemblyOriginatorKeyFile>jmrt_intag.snk</AssemblyOriginatorKeyFile>
-    <PublicSign>true</PublicSign>
+    <PublicSign>false</PublicSign>
     <LangVersion>9</LangVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -127,7 +126,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="jmrt_intag.snk" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
