@@ -33,7 +33,7 @@ namespace intag
         {
             this.directoryName = new System.Windows.Forms.Label();
             this.propertyInputBox = new System.Windows.Forms.RoundedTextBox();
-            this.okButton = new System.Windows.Forms.Button();
+            this.addButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
 
             // 
@@ -60,18 +60,18 @@ namespace intag
             this.propertyInputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PropertyInputBoxKeyDown);
 
             // 
-            // okButton
+            // addButton
             // 
-            this.okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.okButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
-            this.okButton.ForeColor = System.Drawing.SystemColors.Info;
-            this.okButton.Location = new System.Drawing.Point(201, 25);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(43, 21);
-            this.okButton.TabIndex = 5;
-            this.okButton.Text = "OK";
-            this.okButton.UseVisualStyleBackColor = true;
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            this.addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.addButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (204)));
+            this.addButton.ForeColor = System.Drawing.SystemColors.Info;
+            this.addButton.Location = new System.Drawing.Point(201, 25);
+            this.addButton.Name = "addButton";
+            this.addButton.Size = new System.Drawing.Size(43, 21);
+            this.addButton.TabIndex = 5;
+            this.addButton.Text = "+";
+            this.addButton.UseVisualStyleBackColor = true;
+            this.addButton.Click += new System.EventHandler(this.addButton_Click);
 
             // 
             // MainForm
@@ -82,7 +82,7 @@ namespace intag
             this.BackColor = System.Drawing.Color.FromArgb(((int) (((byte) (46)))), ((int) (((byte) (46)))), ((int) (((byte) (46)))));
             this.ClientSize = new System.Drawing.Size(256, 87);
             this.ControlBox = false;
-            this.Controls.Add(this.okButton);
+            this.Controls.Add(this.addButton);
             this.Controls.Add(this.propertyInputBox);
             this.Controls.Add(this.directoryName);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -100,7 +100,7 @@ namespace intag
             this.PerformLayout();
         }
 
-        private System.Windows.Forms.Button okButton;
+        private System.Windows.Forms.Button addButton;
 
         #endregion
 

@@ -113,21 +113,7 @@ namespace intag
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				var tag = propertyInputBox.Text;
-				if (!_tagsOfParentFolder.Contains(tag))
-				{
-					Debug.WriteLine($"Adding new tag {tag}");
-					_tagsOfParentFolder.Add(tag);
-					_selectedTags.Add(tag);
-					AddDynamicButton(_tagsOfParentFolder.Count, tag);
-				}
-				if (_selectedTags.Contains(tag) || _tagsOfParentFolder.Contains(tag))
-				{
-					propertyInputBox.Text = "";
-				}
-				
-				//IniUtils.AssignPropertyToFolder(_folder, propertyInputBox.Text, _oldSetOfTagsAsString);
-				//Environment.Exit(0);
+				AddNewTagToList();
 			}
 			if (e.KeyCode == Keys.Escape)
 			{
@@ -135,10 +121,25 @@ namespace intag
 			}
 		}
 
-		private void okButton_Click(object sender, EventArgs e)
+		private void AddNewTagToList()
 		{
-			IniUtils.AssignPropertyToFolder(_folder, _selectedTags);
-			Environment.Exit(0);
+			var tag = propertyInputBox.Text;
+			if (!_tagsOfParentFolder.Contains(tag))
+			{
+				Debug.WriteLine($"Adding new tag {tag}");
+				_tagsOfParentFolder.Add(tag);
+				_selectedTags.Add(tag);
+				AddDynamicButton(_tagsOfParentFolder.Count, tag);
+			}
+			if (_selectedTags.Contains(tag) || _tagsOfParentFolder.Contains(tag))
+			{
+				propertyInputBox.Text = "";
+			}
+		}
+		
+		private void addButton_Click(object sender, EventArgs e)
+		{
+			AddNewTagToList();
 		}
 	}
 }
