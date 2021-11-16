@@ -91,6 +91,7 @@ namespace intag
 		}
 		private void FormDeactivate(object sender, EventArgs e)
 		{
+			IniUtils.AssignPropertyToFolder(_folder, _selectedTags);
 			Environment.Exit(1);
 		}
 
