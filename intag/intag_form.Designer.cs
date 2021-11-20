@@ -31,9 +31,11 @@ namespace intag
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.directoryName = new System.Windows.Forms.Label();
             this.propertyInputBox = new System.Windows.Forms.RoundedTextBox();
             this.addButton = new System.Windows.Forms.Button();
+            this.ToolTipHint = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
 
             // 
@@ -58,6 +60,7 @@ namespace intag
             this.propertyInputBox.Size = new System.Drawing.Size(185, 21);
             this.propertyInputBox.TabIndex = 0;
             this.propertyInputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PropertyInputBoxKeyDown);
+            this.propertyInputBox.MouseEnter += new System.EventHandler(this.propertyInputBox_MouseEnter);
 
             // 
             // addButton
@@ -99,6 +102,8 @@ namespace intag
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.ToolTip ToolTipHint;
 
         private System.Windows.Forms.Button addButton;
 

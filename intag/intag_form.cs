@@ -15,6 +15,7 @@ namespace intag
 		private static HashSet<string> _selectedTags;
 		private static string _folder;
 		private static List<string> _tagsOfParentFolder;
+		
 		public MainForm(string path)
 		{
 			_folder = path;
@@ -87,6 +88,10 @@ namespace intag
 				//IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
 				//Environment.Exit(0);
 			};
+			newButton.MouseEnter += (sender, args) =>
+			{
+				this.ToolTipHint.SetToolTip(newButton, value);
+			};
 			Controls.Add(newButton);
 		}
 		private void FormDeactivate(object sender, EventArgs e)
@@ -141,6 +146,11 @@ namespace intag
 		private void addButton_Click(object sender, EventArgs e)
 		{
 			AddNewTagToList();
+		}
+	
+		private void propertyInputBox_MouseEnter(object sender, EventArgs e)
+		{
+			this.ToolTipHint.SetToolTip(this.propertyInputBox, propertyInputBox.Text);
 		}
 	}
 }
