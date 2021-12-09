@@ -14,10 +14,6 @@ namespace intag
         {
             if (args.Length == 0)
             {
-                Environment.Exit(1);
-            }
-            if (args.Length == 1 && (args[0].Equals("--install", StringComparison.CurrentCultureIgnoreCase) || args[0].Equals("-i", StringComparison.CurrentCultureIgnoreCase) ))
-            {
                 RegUtils.Install();
                 Environment.Exit(0);
             }
