@@ -16,6 +16,8 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
 ![Tagged Folders Example](images/Result.png)
 
+![Tagged Folders Example - 2](images/Result2.png)
+
 ## Usage
 
 * After the tool is installed, right-click the folder (for Windows 11, you'd have to press 'Show more options'), select InTag.
@@ -25,11 +27,21 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 
 ## Installation
 
-### Via argument
+### Automagical
 
-Run exe with `--install` or `-i` arguement
+Start application once. It *should* "install" itself on it's own after that, but if that doesn't work, though, refer to **Almost automagical** method (aka Run-as-admin) below.
 
-### Manually
+### Almost automagical
+
+> **Disclaimer** I want everyone to be able to use InTag, thus I simplified installation down to just run-as-admin-once :smile:
+
+Open application's context menu (just right mouse button application icon on it in explorer), run application with administrator rights:
+
+![Run as admin](images/RunAsAdmin.png)
+
+That's it, It should be installed now.
+
+### Last resort (aka Manually)
 
 Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
 Alternativelyyou add registry entry (don't forget to fix your path):
