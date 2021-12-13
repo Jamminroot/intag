@@ -4,7 +4,7 @@
 > 
 > [Multistack Launcher GitHub project](https://github.com/Jamminroot/multistack_launcher)
 
-> **SUGGESTIONS ARE WELCOME, SO ARE DONATIONS**, as they both boost my motivattion to improve those tools:+1:
+> **SUGGESTIONS ARE WELCOME, SO ARE DONATIONS**, as they both boost my motivation to improve those tools:+1:
 
 Add tags from explorer context menu. Can scan "neighbours" and use their tags. 
 
