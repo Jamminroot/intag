@@ -22,8 +22,8 @@ namespace intag
 			InitializeComponent();
 			directoryName.Text = path;
 			var desktopIniPath = Path.Combine(path, Constants.DesktopIni);
-			_selectedTags = IniUtils.GetFolderProperties(desktopIniPath);
-			_tagsOfParentFolder = IniUtils.GetNearbyPropertiesValues(path);
+			_selectedTags = FileUtils.GetFolderProperties(desktopIniPath);
+			_tagsOfParentFolder = FileUtils.GetNearbyPropertiesValues(path);
 			var tagIndex = 0;
 			foreach (var tagOfParent in _tagsOfParentFolder)
 			{
@@ -31,10 +31,10 @@ namespace intag
 				AddDynamicButton(tagIndex, tagOfParent);
 			}
 			ResizeRedraw = true;
-			AdjustForHeight();
+			AdjustFormHeight();
 		}
 
-		private void AdjustForHeight()
+		private void AdjustFormHeight()
 		{
 			Height = 87 + 25 * (_tagsOfParentFolder.Count / 2 + 2);
 			Refresh();
@@ -96,7 +96,7 @@ namespace intag
 		}
 		private void FormDeactivate(object sender, EventArgs e)
 		{
-			IniUtils.AssignPropertyToFolder(_folder, _selectedTags);
+			FileUtils.AssignPropertyToFolder(_folder, _selectedTags);
 			Environment.Exit(1);
 		}
 
