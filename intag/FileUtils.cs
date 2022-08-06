@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Permissions;
@@ -10,34 +12,63 @@ namespace intag
 {
 	public static class FileUtils
 	{
-		public static void AssignPropertyToFolder(string folder, HashSet<string> propertyValue)
+		public static void AssignTagsToObject(string obj, HashSet<string> tags)
 		{
-			var desktopIniFilepath = Path.Combine(folder, Constants.DesktopIni);
-			var contents = PrepareContentsForFolder(folder, string.Join(";", propertyValue));
-			
-			var fi = new FileInfo(desktopIniFilepath);
-			var f = new FileIOPermission(FileIOPermissionAccess.AllAccess, desktopIniFilepath);
-			f.AddPathList(FileIOPermissionAccess.AllAccess, new FileInfo(desktopIniFilepath).DirectoryName);
-			if (File.Exists(desktopIniFilepath))
+			if (File.Exists(obj))
 			{
-				fi.IsReadOnly = false;
-			}
-			f.Demand();
-			//TODO: Encoding detection for new files - maybe in %APPDATA% or registry?.. 
-			var enc = Encoding.Default;
-			if (fi.Exists)
+				AssignTagsToFile(obj, tags);
+			} else if (Directory.Exists(obj))
 			{
-				enc = EncodingUtils.DetectTextEncoding(desktopIniFilepath, out _);
-				fi.Attributes ^= FileAttributes.Hidden | FileAttributes.System;
+				AssignTagsToFolder(obj, tags);
 			}
-			File.WriteAllText(desktopIniFilepath, contents, enc);
-			fi.Attributes |= FileAttributes.Hidden;
-			fi.Attributes |= FileAttributes.System;
-			fi.IsReadOnly = true;                  
 		}
 
-		public static HashSet<string> GetFolderProperties(string path)
+		private static void Unhide(FileInfo fi)
 		{
+			var f = new FileIOPermission(FileIOPermissionAccess.AllAccess, fi.FullName);
+			f.AddPathList(FileIOPermissionAccess.AllAccess, fi.FullName);
+			if (fi.Exists) { fi.IsReadOnly = false; }
+			f.Demand();
+			if (fi.Exists)
+			{
+				fi.Attributes ^= FileAttributes.Hidden | FileAttributes.System;
+			}
+		}
+		private static void Hide(FileInfo fi)
+		{
+			fi.Attributes |= FileAttributes.Hidden;
+			fi.Attributes |= FileAttributes.System;
+			fi.IsReadOnly = true; 
+		}
+		public static void AssignTagsToFolder(string folder, HashSet<string> tags)
+		{
+			var desktopIniFilepath = Path.Combine(folder, Constants.DesktopIni);
+			var contents = PrepareContentsForFolder(folder, string.Join(";", tags));
+			var fi = new FileInfo(desktopIniFilepath);
+			Unhide(fi);
+			//TODO: Encoding detection for new files - maybe in %APPDATA% or registry?.. 
+			var enc = Encoding.Default;
+			if (File.Exists(desktopIniFilepath))
+			{
+				enc = EncodingUtils.DetectTextEncoding(desktopIniFilepath, out _);
+			}
+			File.WriteAllText(desktopIniFilepath, contents, enc);
+			Hide(fi);
+		}
+
+		public static void AssignTagsToFile(string file, HashSet<string> tags)
+		{
+			if (!File.Exists(file)) return;
+			var sf = ShellFile.FromFilePath(file);
+			var prop = sf.Properties.GetProperty<string[]>(Constants.CanonicalKeywordsName);
+			prop.Value = tags.ToArray();
+			
+			//sf.Properties.GetPropertyWriter().WriteProperty(prop.PropertyKey, tags.ToArray());
+		}
+		
+		public static HashSet<string> GetFolderTags(string folder)
+		{
+			var path = Path.Combine(folder, Constants.DesktopIni);
 			if (!File.Exists(path) || !IsCorrectSectionPresentInDesktopIni(path)) return new HashSet<string>();
 			var enc = EncodingUtils.DetectTextEncoding(path, out var str);
 			var lines = str.Split(new []{'\n'});
@@ -63,15 +94,28 @@ namespace intag
 			}
 			return "";
 		}
-		
-		public static List<string> GetNearbyPropertiesValues(string targetFolder)
+
+		public static HashSet<string> GetObjectTags(string obj)
 		{
-			var directoryInfo = new DirectoryInfo(targetFolder).Parent;
+			if (File.Exists(obj))
+			{
+				return GetFileTags(obj).ToHashSet();
+			} 
+			else if (Directory.Exists(obj))
+			{
+				return GetFolderTags(obj).ToHashSet();
+			}
+			return new HashSet<string>();
+		}
+		
+		public static List<string> GetNearbyTags(string targetObject)
+		{
+			var directoryInfo= File.Exists(targetObject) ? new DirectoryInfo(targetObject).Parent : new DirectoryInfo(targetObject);
 			if (directoryInfo == null) return null;
 			var result = new HashSet<string>();
 			foreach (var child in directoryInfo.GetDirectories())
 			{
-				var propertyValue = GetFolderProperties(Path.Combine(child.FullName, Constants.DesktopIni));
+				var propertyValue = GetFolderTags(child.FullName);
 				if (propertyValue.Count==0) continue;
 				result.UnionWith(propertyValue);
 			}
@@ -86,8 +130,10 @@ namespace intag
 		private static string[] GetFileTags(string file)
 		{
 			if (!File.Exists(file)) return new string[]{};
-			var sf = ShellFile.FromFilePath(file);
-			return sf.Properties.GetProperty(Constants.CanonicalTagViewAggregateName)?.ValueAsObject as string[] ?? new string[] {};
+			using (var sf = ShellFile.FromFilePath(file))
+			{
+				return sf.Properties.GetProperty(Constants.CanonicalTagViewAggregateName)?.ValueAsObject as string[] ?? new string[] {};	
+			}
 			//return new List<string>();//props.ValueAsObject as string)?.Split(';').ToList() ?? new List<string>();
 		}
 		

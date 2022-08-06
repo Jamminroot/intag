@@ -22,7 +22,7 @@ namespace intag
                 RegUtils.Uninstall();
                 Environment.Exit(0);
             }
-            if (!Directory.Exists(args[0]))
+            if (!Directory.Exists(args[0]) && !File.Exists(args[0]))
             {
                 Environment.Exit(1);
             }

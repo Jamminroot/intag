@@ -6,6 +6,7 @@
 		internal const string RegistryName = "InTag";
 		internal const string DesktopIni = "Desktop.ini";
 		internal const string CanonicalTagViewAggregateName = "System.Photo.TagViewAggregate";
+		internal const string CanonicalKeywordsName = "System.Keywords";
 		internal const string MagicGuid = "{F29F85E0-4FF9-1068-AB91-08002B27B3D9}";
 
 		internal const string MagicPropertyTemplate = MagicPropertyName + "=31, ";

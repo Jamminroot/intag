@@ -13,17 +13,16 @@ namespace intag
 		private const int WmNclbuttondown = 0xA1;
 		private const int HtCaption = 0x2;
 		private static HashSet<string> _selectedTags;
-		private static string _folder;
+		private static string _object;
 		private static List<string> _tagsOfParentFolder;
 		
 		public MainForm(string path)
 		{
-			_folder = path;
+			_object = path;
 			InitializeComponent();
 			directoryName.Text = path;
-			var desktopIniPath = Path.Combine(path, Constants.DesktopIni);
-			_selectedTags = FileUtils.GetFolderProperties(desktopIniPath);
-			_tagsOfParentFolder = FileUtils.GetNearbyPropertiesValues(path);
+			_selectedTags = FileUtils.GetObjectTags(path);
+			_tagsOfParentFolder = FileUtils.GetNearbyTags(path);
 			var tagIndex = 0;
 			foreach (var tagOfParent in _tagsOfParentFolder)
 			{
@@ -96,7 +95,7 @@ namespace intag
 		}
 		private void FormDeactivate(object sender, EventArgs e)
 		{
-			FileUtils.AssignPropertyToFolder(_folder, _selectedTags);
+			FileUtils.AssignTagsToObject(_object, _selectedTags);
 			Environment.Exit(1);
 		}
 
