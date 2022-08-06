@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
-using intag.ThirdParty;
 
 namespace intag
 {
 	public static class FileUtils
 	{
+		static PropertyKey _propertyKey = new ("f29f85e0-4ff9-1068-ab91-08002b27b3d9", 5);
+		static Guid _shellItem2Guid = new ("7E9FB0D3-919F-4307-AB2E-9B1860310C93");
+		static Guid _propStoreGuid =  new ("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99");
+
 		public static void AssignTagsToObject(string obj, HashSet<string> tags)
 		{
 			if (File.Exists(obj))
@@ -59,9 +62,23 @@ namespace intag
 		public static void AssignTagsToFile(string file, HashSet<string> tags)
 		{
 			if (!File.Exists(file)) return;
-			var sf = ShellFile.FromFilePath(file);
-			var prop = sf.Properties.GetProperty<string[]>(Constants.CanonicalKeywordsName);
-			prop.Value = tags.ToArray();
+			try
+			{
+				if (SHCreateItemFromParsingName(file, IntPtr.Zero, ref _shellItem2Guid, out var shellItem) != 0) throw new SystemException("Failed to create shell item");
+				if (PSGetPropertyKeyFromName(Constants.CanonicalKeywordsName, out var propKey) != 0) throw new SystemException("Failed to create property key");
+				if (shellItem == null) return;
+				using var propVar = new PropVar(tags.ToArray());
+				if(shellItem.GetPropertyStore(GetPropertyStoreOptions.ReadWrite, ref _propStoreGuid, out var propStore)!=0) throw new SystemException("Failed to get property store");
+				propStore.SetValue(ref _propertyKey, propVar);
+				if (propStore.Commit() != HRes.Ok) throw new SystemException("Failed to save tags");
+				
+				Marshal.ReleaseComObject(propStore);
+				Marshal.ReleaseComObject(shellItem);
+			}
+			catch
+			{
+				// ignored
+			}
 		}
 		
 		public static HashSet<string> GetFolderTags(string folder)
@@ -125,14 +142,40 @@ namespace intag
 			return result.ToList();
 		}
 
-		private static string[] GetFileTags(string file)
+		[DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+		private static extern int PSGetPropertyKeyFromName([In, MarshalAs(UnmanagedType.LPWStr)] string pszCanonicalName, out PropertyKey propkey);
+			
+			
+		[DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int SHCreateItemFromParsingName(
+            [MarshalAs(UnmanagedType.LPWStr)] string path,
+            // The following parameter is not used - binding context.
+            IntPtr pbc,
+            ref Guid riid,
+            [MarshalAs(UnmanagedType.Interface)] out IShellItem2 shellItem);
+        
+		private static HashSet<string> GetFileTags(string file)
 		{
-			if (!File.Exists(file)) return new string[]{};
-			using (var sf = ShellFile.FromFilePath(file))
+			if (!File.Exists(file)) return new HashSet<string>();
+			try
 			{
-				return sf.Properties.GetProperty(Constants.CanonicalKeywordsName)?.ValueAsObject as string[] ?? new string[] {};	
+				if (SHCreateItemFromParsingName(file, IntPtr.Zero, ref _shellItem2Guid, out var shellItem) != 0) throw new SystemException("Failed to create shell item");
+				if (PSGetPropertyKeyFromName(Constants.CanonicalKeywordsName, out var propKey) != 0) throw new SystemException("Failed to create property key");
+				if (shellItem == null) return new HashSet<string>();
+				using var propVar = new PropVar();
+				shellItem.GetProperty(ref propKey, propVar);
+				if(shellItem.GetPropertyStore(GetPropertyStoreOptions.BestEffort, ref _propStoreGuid, out var propStore)!=0) throw new SystemException("Failed to get property store");
+				propStore.GetValue(ref _propertyKey, propVar);
+				Marshal.ReleaseComObject(propStore);
+				Marshal.ReleaseComObject(shellItem);
+				if (propVar.Value is string[] { Length: > 0 } propValues) return new HashSet<string>(propValues);
+				
 			}
-			//return new List<string>();//props.ValueAsObject as string)?.Split(';').ToList() ?? new List<string>();
+			catch
+			{
+				// ignored
+			}
+			return new HashSet<string>();
 		}
 		
 		private static bool IsCorrectSectionPresentInDesktopIni(string filePath)

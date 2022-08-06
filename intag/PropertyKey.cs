@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace intag.ThirdParty
+namespace intag
 {
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct PropertyKey : IEquatable<PropertyKey>
@@ -58,16 +58,16 @@ namespace intag.ThirdParty
         }
 
         /// <summary>Implements the == (equality) operator.</summary>
-        /// <param name="propKey1">First property key to compare.</param>
-        /// <param name="propKey2">Second property key to compare.</param>
+        /// <param name="propertyKey1">First property key to compare.</param>
+        /// <param name="propertyKey2">Second property key to compare.</param>
         /// <returns>true if object a equals object b. false otherwise.</returns>
-        public static bool operator ==(PropertyKey propKey1, PropertyKey propKey2) => propKey1.Equals(propKey2);
+        public static bool operator ==(PropertyKey propertyKey1, PropertyKey propertyKey2) => propertyKey1.Equals(propertyKey2);
 
         /// <summary>Implements the != (inequality) operator.</summary>
-        /// <param name="propKey1">First property key to compare</param>
-        /// <param name="propKey2">Second property key to compare.</param>
+        /// <param name="propertyKey1">First property key to compare</param>
+        /// <param name="propertyKey2">Second property key to compare.</param>
         /// <returns>true if object a does not equal object b. false otherwise.</returns>
-        public static bool operator !=(PropertyKey propKey1, PropertyKey propKey2) => !propKey1.Equals(propKey2);
+        public static bool operator !=(PropertyKey propertyKey1, PropertyKey propertyKey2) => !propertyKey1.Equals(propertyKey2);
 
         /// <summary>Override ToString() to provide a user friendly string representation</summary>
         /// <returns>String representing the property key</returns>

@@ -6,15 +6,15 @@ namespace intag
 {
 	public static class RegUtils
 	{
-		public static void Install()
+		private static void InstallExtension(string ext)
 		{
-			var subKeyIcon = Registry.ClassesRoot.CreateSubKey($@"Folder\shell\{Constants.RegistryName}");
+			var subKeyIcon = Registry.ClassesRoot.CreateSubKey($@"{ext}\shell\{Constants.RegistryName}");
 			if (subKeyIcon == null)
 			{
 				return;
 			}
 			
-			var subKey = Registry.ClassesRoot.CreateSubKey($@"Folder\shell\{Constants.RegistryName}\command");
+			var subKey = Registry.ClassesRoot.CreateSubKey($@"{ext}\shell\{Constants.RegistryName}\command");
 			if (subKey == null)
 			{
 				return;
@@ -35,9 +35,27 @@ namespace intag
 			subKey.Close();  
 		}
 
+		private static void InstallFiles() => InstallExtension("*");
+		private static void InstallFolder() => InstallExtension("Folder");
+		
+		public static void Install()
+		{
+			InstallFolder();
+			InstallFiles();
+		}
+
+		private static void UninstallExt(string ext)
+		{
+			Registry.ClassesRoot.DeleteSubKeyTree($@"{ext}\shell\{Constants.RegistryName}", false);
+		}
+
+		private static void UninstallFolder() => UninstallExt("Folder");
+		private static void UninstallFiles() => UninstallExt("*");
+
 		public static void Uninstall()
 		{
-			Registry.ClassesRoot.DeleteSubKeyTree($@"Folder\shell\{Constants.RegistryName}", false);
+			UninstallFolder();
+			UninstallFiles();
 		}
 	}
 }
