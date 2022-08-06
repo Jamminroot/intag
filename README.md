@@ -8,7 +8,7 @@
 
 Add tags from explorer context menu. Can scan "neighbours" and use their tags. 
 
-Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
+Aimed to be small and kind of lightweight.
 
 ![Context Menu Example](images/ContextMenu.png)
 
@@ -21,7 +21,7 @@ Aimed to be small and kind of lightweight (yet I believe code is fairly bad :D)
 ## Usage
 
 * After the tool is installed, right-click the folder (for Windows 11, you'd have to press 'Show more options'), select InTag.
-* Assign tags you want to a folder. Neighboring tags are included to list of available for convenience.
+* Assign tags you want to a folder (or a file, if it does support `System.Keywords` metadata). Neighboring tags are included to list of available for convenience.
 * Once done, just click back to the folder or press esc, tags would be assigned. Note that it takes some time for explorer to detect those changes.
 * If you haven't yet, make sure to enable grouping by tags (Context menu on the folder background > group by > More... > Select 'Tags' in a list, and use it a as a grouping criteria).
 
@@ -43,12 +43,15 @@ That's it, It should be installed now.
 
 ### Last resort (aka Manually)
 
-Put .exe somewhere, make sure it's executable - I did try to fix those permissions, but did not bother too much tbh (only spent like 2 hrs on this including "investigation").
-Alternativelyyou add registry entry (don't forget to fix your path):
+Put .exe somewhere (for example, c:\tools\intag.exe).
+
+Alternatively you can add registry entry (don't forget to fix your path):
 
 > **NOTE**: This does not include icon. For icon refer to the code below
 
-in `HKEY_CLASSES_ROOT\Folder\shell\InTag\command`, replace Default in with `"C:\\<PUT YOUR PATH HERE>\\intag.exe" "%1"`
+In `HKEY_CLASSES_ROOT\Folder\shell\InTag\command`, replace `Default` value with `"C:\\<PUT YOUR PATH HERE>\\intag.exe" "%1"` to support folders.
+
+In `HKEY_CLASSES_ROOT\*\shell\InTag\command`, replace `Default` value with `"C:\\<PUT YOUR PATH HERE>\\intag.exe" "%1"` to support all files.
 
 > **NOTE**: Notice double quotes, that is necessary for paths with spaces to work.
 
@@ -63,6 +66,12 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\Folder\shell\InTag\command]
 @="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" \"%1\""
+
+[HKEY_CLASSES_ROOT\*\shell\InTag]
+"Icon"="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\""
+
+[HKEY_CLASSES_ROOT\*\shell\InTag\command]
+@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" \"%1\""
 ```
 
 ## Uninstall
@@ -73,4 +82,4 @@ Run exe with `--uninstall` or `-u` argument
 
 ### Manually
 
-Remove `HKEY_CLASSES_ROOT\Folder\shell\InTag` entry
+Remove `HKEY_CLASSES_ROOT\Folder\shell\InTag` and `HKEY_CLASSES_ROOT\*\shell\InTag` entries
