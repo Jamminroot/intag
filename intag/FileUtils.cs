@@ -62,8 +62,6 @@ namespace intag
 			var sf = ShellFile.FromFilePath(file);
 			var prop = sf.Properties.GetProperty<string[]>(Constants.CanonicalKeywordsName);
 			prop.Value = tags.ToArray();
-			
-			//sf.Properties.GetPropertyWriter().WriteProperty(prop.PropertyKey, tags.ToArray());
 		}
 		
 		public static HashSet<string> GetFolderTags(string folder)
@@ -132,7 +130,7 @@ namespace intag
 			if (!File.Exists(file)) return new string[]{};
 			using (var sf = ShellFile.FromFilePath(file))
 			{
-				return sf.Properties.GetProperty(Constants.CanonicalTagViewAggregateName)?.ValueAsObject as string[] ?? new string[] {};	
+				return sf.Properties.GetProperty(Constants.CanonicalKeywordsName)?.ValueAsObject as string[] ?? new string[] {};	
 			}
 			//return new List<string>();//props.ValueAsObject as string)?.Split(';').ToList() ?? new List<string>();
 		}
