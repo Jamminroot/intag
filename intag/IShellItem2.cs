@@ -44,7 +44,7 @@ namespace intag
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HRes GetParent([MarshalAs(UnmanagedType.Interface)] out IShellItem ppsi);
+        new HRes GetParent([MarshalAs(UnmanagedType.Interface)] out IShellItem ppsi);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
