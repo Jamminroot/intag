@@ -125,7 +125,7 @@ namespace intag
 		
 		public static List<string> GetNearbyTags(string targetObject)
 		{
-			var directoryInfo= File.Exists(targetObject) ? new DirectoryInfo(targetObject).Parent : new DirectoryInfo(targetObject);
+			var directoryInfo = new DirectoryInfo(targetObject).Parent;
 			if (directoryInfo == null) return null;
 			var result = new HashSet<string>();
 			foreach (var child in directoryInfo.GetDirectories())
@@ -137,6 +137,7 @@ namespace intag
 			foreach (var file in directoryInfo.GetFiles())
 			{
 				var fileTags = GetFileTags(file.FullName);
+				if (fileTags.Count==0) continue;
 				result.UnionWith(fileTags);
 			}
 			return result.ToList();
@@ -145,11 +146,9 @@ namespace intag
 		[DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		private static extern int PSGetPropertyKeyFromName([In, MarshalAs(UnmanagedType.LPWStr)] string pszCanonicalName, out PropertyKey propkey);
 			
-			
 		[DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int SHCreateItemFromParsingName(
             [MarshalAs(UnmanagedType.LPWStr)] string path,
-            // The following parameter is not used - binding context.
             IntPtr pbc,
             ref Guid riid,
             [MarshalAs(UnmanagedType.Interface)] out IShellItem2 shellItem);

@@ -83,3 +83,7 @@ Run exe with `--uninstall` or `-u` argument
 ### Manually
 
 Remove `HKEY_CLASSES_ROOT\Folder\shell\InTag` and `HKEY_CLASSES_ROOT\*\shell\InTag` entries
+
+### Third-Party Notice
+
+Code for individual files management was taken from Windows API Code Pack
