@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -12,22 +13,30 @@ namespace intag
 	{
 		private const int WmNclbuttondown = 0xA1;
 		private const int HtCaption = 0x2;
-		private static HashSet<string> _selectedTags;
-		private static string _object;
-		private static List<string> _tagsOfParentFolder;
-		
-		public MainForm(string path)
+		private static Dictionary<string, HashSet<string>> _selectedTags;
+		private static string[] _objects;
+		private static List<string> _tagOptions;
+		private static bool _hasChanged;
+		public MainForm(string[] batch)
 		{
-			_object = path;
+			_objects = batch.Where(b=>!string.IsNullOrWhiteSpace(b)).ToArray();
 			InitializeComponent();
-			directoryName.Text = path;
-			_selectedTags = FileUtils.GetObjectTags(path);
-			_tagsOfParentFolder = FileUtils.GetNearbyTags(path);
+			if (_objects.Length == 1)
+			{
+				selectedObjectsLabel.Text = _objects[0];
+			}
+			else
+			{
+				selectedObjectsLabel.Text = "Multiselect (" + _objects.Length + ")";
+				ToolTipHint.SetToolTip(selectedObjectsLabel, string.Join("\n", _objects));
+			}
+			_selectedTags = FileUtils.GetObjectsTags(_objects);
+			_tagOptions = FileUtils.GetNearbyTags(_objects[0]);
 			var tagIndex = 0;
-			foreach (var tagOfParent in _tagsOfParentFolder)
+			foreach (var tagOption in _tagOptions)
 			{
 				tagIndex++;
-				AddDynamicButton(tagIndex, tagOfParent);
+				AddDynamicButton(tagIndex, tagOption);
 			}
 			ResizeRedraw = true;
 			AdjustFormHeight();
@@ -35,7 +44,7 @@ namespace intag
 
 		private void AdjustFormHeight()
 		{
-			Height = 87 + 25 * (_tagsOfParentFolder.Count / 2 + 2);
+			Height = 87 + 25 * (_tagOptions.Count / 2 + 2);
 			Refresh();
 		}
 		
@@ -54,11 +63,53 @@ namespace intag
 		[DllImport("user32.dll")]
 		private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
-		private void AddDynamicButton(int index, string value)
+		private static string[] ObjectsWithTag(string tag)
+		{
+			return _selectedTags.Where(sel => sel.Value.Contains(tag)).Select(pair=>pair.Key).ToArray();
+		}
+
+		private void UpdateButton(ref SwitchButton button, string tag)
+		{
+			var withTag = ObjectsWithTag(tag);
+			if (withTag.Length == _selectedTags.Count)
+			{
+				button.ForeColor = Color.FromArgb(255, 231, 143);
+				button.Text = tag;
+			}
+			else if (withTag.Length > 0)
+			{
+				button.ForeColor = Color.FromArgb(255, 231, 143);
+				button.Text = $"{tag} (x{withTag.Length})";
+			}
+			else
+			{
+				button.ForeColor = Color.FromArgb(200, 180, 180);
+				button.Text = tag;
+			}
+		}
+
+		private void UpdateButtonTooltip(ref SwitchButton button, string tag)
+		{
+			var withTag = ObjectsWithTag(tag);
+			if (withTag.Length == _selectedTags.Count)
+			{
+				ToolTipHint.SetToolTip(button, "[All objects]");
+			}
+			else if (withTag.Length > 0)
+			{
+				ToolTipHint.SetToolTip(button, string.Join("\n", withTag));;
+			}
+			else
+			{
+				ToolTipHint.SetToolTip(button, "[None]");
+			}
+		}
+		
+		private void AddDynamicButton(int index, string tag)
 		{
 			var newButton = new SwitchButton
 			{
-				Text = value,
+				Text = tag,
 				Location = new Point(10 + index % 2 * 120, 80 + ((index - 1) / 2 - 1) * 25),
 				Size = new Size(115, 23),
 				TabStop = false,
@@ -68,34 +119,49 @@ namespace intag
 					BorderSize = 0
 				},
 				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
-				ForeColor =_selectedTags.Contains(value) ? Color.FromArgb(255, 231, 143) : Color.FromArgb(200,180, 180),
 			};
 			newButton.Click += (sender, args) =>
 			{
-				Debug.WriteLine($"Clicked on a button: {value}");
+				_hasChanged = true;
+				Debug.WriteLine($"Clicked on a button: {tag}");
 				//propertyInputBox.Text = value;
-				if (_selectedTags.Contains(value))
+				var withTag = ObjectsWithTag(tag);
+
+				if (withTag.Length>0)
 				{
-					_selectedTags.Remove(value);
+					foreach (var pair in _selectedTags)
+					{
+						pair.Value.Remove(tag);
+					}
 				}
 				else
 				{
-					_selectedTags.Add(value);
+					foreach (var obj in _objects)
+					{
+						if (_selectedTags.ContainsKey(obj))
+						{
+							_selectedTags[obj].Add(tag);
+						}
+						else
+						{
+							_selectedTags[obj] = new HashSet<string> {tag};
+						}
+					}
 				}
-				newButton.ForeColor = _selectedTags.Contains(value) ? Color.FromArgb(255, 231, 143) : Color.FromArgb(200, 180, 180);
+				UpdateButton(ref newButton, tag);
+				UpdateButtonTooltip(ref newButton, tag);
+				
 
 				//IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
 				//Environment.Exit(0);
 			};
-			newButton.MouseEnter += (sender, args) =>
-			{
-				this.ToolTipHint.SetToolTip(newButton, value);
-			};
 			Controls.Add(newButton);
+			UpdateButton(ref newButton, tag);
+			UpdateButtonTooltip(ref newButton, tag);
 		}
 		private void FormDeactivate(object sender, EventArgs e)
 		{
-			FileUtils.AssignTagsToObject(_object, _selectedTags);
+			if (_hasChanged) { FileUtils.AssignTags(_selectedTags); }
 			Environment.Exit(1);
 		}
 
@@ -118,7 +184,7 @@ namespace intag
 		{
 			if (e.KeyCode == Keys.Enter)
 			{
-				AddNewTagToList();
+				AddTagOption();
 			}
 			if (e.KeyCode == Keys.Escape)
 			{
@@ -126,17 +192,16 @@ namespace intag
 			}
 		}
 
-		private void AddNewTagToList()
+		private void AddTagOption()
 		{
 			var tag = propertyInputBox.Text;
-			if (!_tagsOfParentFolder.Contains(tag))
+			if (!_tagOptions.Contains(tag))
 			{
 				Debug.WriteLine($"Adding new tag {tag}");
-				_tagsOfParentFolder.Add(tag);
-				_selectedTags.Add(tag);
-				AddDynamicButton(_tagsOfParentFolder.Count, tag);
+				_tagOptions.Add(tag);
+				AddDynamicButton(_tagOptions.Count, tag);
 			}
-			if (_selectedTags.Contains(tag) || _tagsOfParentFolder.Contains(tag))
+			if (_selectedTags.Any(pair=>pair.Value.Contains(tag)) || _tagOptions.Contains(tag))
 			{
 				propertyInputBox.Text = "";
 			}
@@ -144,7 +209,7 @@ namespace intag
 		
 		private void addButton_Click(object sender, EventArgs e)
 		{
-			AddNewTagToList();
+			AddTagOption();
 		}
 	
 		private void propertyInputBox_MouseEnter(object sender, EventArgs e)

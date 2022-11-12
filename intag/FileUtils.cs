@@ -15,14 +15,19 @@ namespace intag
 		static Guid _shellItem2Guid = new ("7E9FB0D3-919F-4307-AB2E-9B1860310C93");
 		static Guid _propStoreGuid =  new ("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99");
 
-		public static void AssignTagsToObject(string obj, HashSet<string> tags)
+		public static void AssignTags(Dictionary<string, HashSet<string>> objectTags)
 		{
-			if (File.Exists(obj))
+			foreach (var pair in objectTags)
 			{
-				AssignTagsToFile(obj, tags);
-			} else if (Directory.Exists(obj))
-			{
-				AssignTagsToFolder(obj, tags);
+				var obj = pair.Key;
+				var tags = pair.Value;
+				if (File.Exists(obj))
+				{
+					AssignTagsToFile(obj, tags);
+				} else if (Directory.Exists(obj))
+				{
+					AssignTagsToFolder(obj, tags);
+				}
 			}
 		}
 
@@ -110,17 +115,21 @@ namespace intag
 			return "";
 		}
 
-		public static HashSet<string> GetObjectTags(string obj)
+		public static Dictionary<string, HashSet<string>> GetObjectsTags(string[] objs)
 		{
-			if (File.Exists(obj))
+			var tags = new Dictionary<string, HashSet<string>>();
+			foreach (var obj in objs)
 			{
-				return GetFileTags(obj).ToHashSet();
-			} 
-			else if (Directory.Exists(obj))
-			{
-				return GetFolderTags(obj).ToHashSet();
+				if (File.Exists(obj))
+				{
+					tags[obj] = GetFileTags(obj);
+				} 
+				else if (Directory.Exists(obj))
+				{
+					tags[obj] = GetFolderTags(obj);
+				}
 			}
-			return new HashSet<string>();
+			return tags;
 		}
 		
 		public static List<string> GetNearbyTags(string targetObject)

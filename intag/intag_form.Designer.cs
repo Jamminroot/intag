@@ -32,23 +32,24 @@ namespace intag
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.directoryName = new System.Windows.Forms.Label();
+            this.selectedObjectsLabel = new System.Windows.Forms.Label();
             this.propertyInputBox = new System.Windows.Forms.RoundedTextBox();
             this.addButton = new System.Windows.Forms.Button();
             this.ToolTipHint = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
 
             // 
-            // directoryName
+            // selectedObjectsLabel
             // 
-            this.directoryName.AutoSize = true;
-            this.directoryName.Font = new System.Drawing.Font("Calibri", 9.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
-            this.directoryName.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (231)))), ((int) (((byte) (143)))));
-            this.directoryName.Location = new System.Drawing.Point(7, 9);
-            this.directoryName.Name = "directoryName";
-            this.directoryName.Size = new System.Drawing.Size(68, 15);
-            this.directoryName.TabIndex = 4;
-            this.directoryName.Text = "<DirName>";
+            this.selectedObjectsLabel.AutoSize = true;
+            this.selectedObjectsLabel.Font = new System.Drawing.Font("Calibri", 9.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte) (0)));
+            this.selectedObjectsLabel.ForeColor = System.Drawing.Color.FromArgb(((int) (((byte) (255)))), ((int) (((byte) (231)))), ((int) (((byte) (143)))));
+            this.selectedObjectsLabel.Location = new System.Drawing.Point(7, 9);
+            this.selectedObjectsLabel.Name = "selectedObjectsLabel";
+            this.selectedObjectsLabel.Size = new System.Drawing.Size(54, 15);
+            this.selectedObjectsLabel.TabIndex = 4;
+            this.selectedObjectsLabel.Text = "Selected";
+            this.ToolTipHint.SetToolTip(this.selectedObjectsLabel, "SSS");
 
             // 
             // propertyInputBox
@@ -87,7 +88,7 @@ namespace intag
             this.ControlBox = false;
             this.Controls.Add(this.addButton);
             this.Controls.Add(this.propertyInputBox);
-            this.Controls.Add(this.directoryName);
+            this.Controls.Add(this.selectedObjectsLabel);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
@@ -109,7 +110,7 @@ namespace intag
 
         #endregion
 
-        private System.Windows.Forms.Label directoryName;
+        private System.Windows.Forms.Label selectedObjectsLabel;
         private System.Windows.Forms.RoundedTextBox propertyInputBox;
     }
 }
