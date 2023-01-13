@@ -6,7 +6,7 @@ namespace intag
 {
 	public static class EncodingUtils
 	{
-				/// <summary>
+		/// <summary>
 		/// Taken from Dan W's answer: https://stackoverflow.com/a/12853721/9092489
 		/// </summary>
 		/// <param name="filename"></param>
@@ -44,7 +44,7 @@ namespace intag
 		    int i = 0;
 		    bool utf8 = false;
 		    while (i < taster - 4)
-		    {
+		    { 
 		        if (b[i] <= 0x7F) { i += 1; continue; }     // If all characters are below 0x80, then it is valid UTF8, but UTF8 is not 'required' (and therefore the text is more desirable to be treated as the default codepage of the computer). Hence, there's no "utf8 = true;" code unlike the next three checks.
 		        if (b[i] >= 0xC2 && b[i] < 0xE0 && b[i + 1] >= 0x80 && b[i + 1] < 0xC0) { i += 2; utf8 = true; continue; }
 		        if (b[i] >= 0xE0 && b[i] < 0xF0 && b[i + 1] >= 0x80 && b[i + 1] < 0xC0 && b[i + 2] >= 0x80 && b[i + 2] < 0xC0) { i += 3; utf8 = true; continue; }
