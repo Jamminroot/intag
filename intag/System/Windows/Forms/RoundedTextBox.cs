@@ -18,7 +18,7 @@
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            Region = Drawing.Region.FromHrgn(CreateRoundRectRgn(2, 1, Width, Height, 3, 3));
+            Region = Drawing.Region.FromHrgn(CreateRoundRectRgn(1, 1, Width, Height, 1, 1));
         }
     }
 }

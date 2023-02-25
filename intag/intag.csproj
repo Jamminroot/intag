@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.4.1.0</ApplicationVersion>
+    <ApplicationVersion>1.5.0.0</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -62,7 +62,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>BDB5B99461146C45C3742A26A86F27B077AE7E79</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>C91A6270149A6516DD4375AEAC01191F4ACAFEB4</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>
@@ -82,6 +82,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>intag.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
@@ -106,6 +109,7 @@
     <Compile Include="HRes.cs" />
     <Compile Include="IPropertyStore.cs" />
     <Compile Include="IShellItem2.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="PropertyKey.cs" />
     <Compile Include="PropVar.cs" />
     <Compile Include="ShEnums.cs" />
@@ -118,9 +122,6 @@
     </Compile>
     <Compile Include="intag_form.Designer.cs">
       <Link>intag_form.Designer.cs</Link>
-    </Compile>
-    <Compile Include="Program.cs">
-      <Link>Program.cs</Link>
     </Compile>
     <Compile Include="RegUtils.cs">
       <Link>RegUtils.cs</Link>
@@ -179,6 +180,8 @@
     <Content Include="..\README.md">
       <Link>README.md</Link>
     </Content>
+    <Content Include="Resources\add.png" />
+    <Content Include="Resources\remove.png" />
     <Content Include="intag_512.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

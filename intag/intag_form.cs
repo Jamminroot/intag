@@ -13,10 +13,15 @@ namespace intag
 	{
 		private const int WmNclbuttondown = 0xA1;
 		private const int HtCaption = 0x2;
+		
+		/// <summary>
+		/// Key is object, value is tags assigned to it
+		/// </summary>
 		private static Dictionary<string, HashSet<string>> _selectedTags;
+		private static Dictionary<string, HashSet<string>> _selectedTagsOnLoad;
 		private static string[] _objects;
+		private List<SwitchButton> _buttons = new();
 		private static List<string> _tagOptions;
-		private static bool _hasChanged;
 		public MainForm(string[] batch)
 		{
 			_objects = batch.Where(b=>!string.IsNullOrWhiteSpace(b)).ToArray();
@@ -31,6 +36,8 @@ namespace intag
 				ToolTipHint.SetToolTip(selectedObjectsLabel, string.Join("\n", _objects));
 			}
 			_selectedTags = FileUtils.GetObjectsTags(_objects);
+			_selectedTagsOnLoad = _selectedTags.ToDictionary(entry => entry.Key, entry => new HashSet<string>(entry.Value));
+			
 			_tagOptions = FileUtils.GetNearbyTags(_objects[0]);
 			var tagIndex = 0;
 			foreach (var tagOption in _tagOptions)
@@ -42,6 +49,8 @@ namespace intag
 			AdjustFormHeight();
 		}
 
+		private static bool Changed => !(_selectedTagsOnLoad.All(pair => _selectedTags.ContainsKey(pair.Key) && _selectedTags[pair.Key].SetEquals(pair.Value)) && _selectedTags.All(pair => _selectedTagsOnLoad.ContainsKey(pair.Key) && _selectedTagsOnLoad[pair.Key].SetEquals(pair.Value)));
+		
 		private void AdjustFormHeight()
 		{
 			Height = 87 + 25 * (_tagOptions.Count / 2 + 2);
@@ -51,7 +60,7 @@ namespace intag
 		protected override void OnCreateControl()
 		{
 			base.OnCreateControl();
-			Region = Region.FromHrgn(CreateRoundRectRgn(2, 3, Width, Height, 15, 15));
+			Region = Region.FromHrgn(CreateRoundRectRgn(2, 3, Width, Height, 3, 3));
 		}
 
 		[DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
@@ -104,8 +113,23 @@ namespace intag
 				ToolTipHint.SetToolTip(button, "[None]");
 			}
 		}
+
+		private void SelectTagOption(string tag)
+		{
+			foreach (var obj in _objects)
+			{
+				if (_selectedTags.ContainsKey(obj))
+				{
+					_selectedTags[obj].Add(tag);
+				}
+				else
+				{
+					_selectedTags[obj] = new HashSet<string> {tag};
+				}
+			}
+		}
 		
-		private void AddDynamicButton(int index, string tag)
+		private void AddDynamicButton(int index, string tag, bool selected = false)
 		{
 			var newButton = new SwitchButton
 			{
@@ -118,11 +142,16 @@ namespace intag
 				{
 					BorderSize = 0
 				},
+				Selected = selected,
+				Tag = tag,
 				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
 			};
+			if (selected)
+			{
+				SelectTagOption(tag);
+			}
 			newButton.Click += (sender, args) =>
 			{
-				_hasChanged = true;
 				Debug.WriteLine($"Clicked on a button: {tag}");
 				//propertyInputBox.Text = value;
 				var withTag = ObjectsWithTag(tag);
@@ -136,21 +165,11 @@ namespace intag
 				}
 				else
 				{
-					foreach (var obj in _objects)
-					{
-						if (_selectedTags.ContainsKey(obj))
-						{
-							_selectedTags[obj].Add(tag);
-						}
-						else
-						{
-							_selectedTags[obj] = new HashSet<string> {tag};
-						}
-					}
+					SelectTagOption(tag);
 				}
 				UpdateButton(ref newButton, tag);
 				UpdateButtonTooltip(ref newButton, tag);
-				
+
 
 				//IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
 				//Environment.Exit(0);
@@ -161,7 +180,7 @@ namespace intag
 		}
 		private void FormDeactivate(object sender, EventArgs e)
 		{
-			if (_hasChanged) { FileUtils.AssignTags(_selectedTags); }
+			if (Changed) { FileUtils.AssignTags(_selectedTags); }
 			Environment.Exit(1);
 		}
 
@@ -199,7 +218,7 @@ namespace intag
 			{
 				Debug.WriteLine($"Adding new tag {tag}");
 				_tagOptions.Add(tag);
-				AddDynamicButton(_tagOptions.Count, tag);
+				AddDynamicButton(_tagOptions.Count, tag, true);
 			}
 			if (_selectedTags.Any(pair=>pair.Value.Contains(tag)) || _tagOptions.Contains(tag))
 			{
@@ -215,6 +234,21 @@ namespace intag
 		private void propertyInputBox_MouseEnter(object sender, EventArgs e)
 		{
 			this.ToolTipHint.SetToolTip(this.propertyInputBox, propertyInputBox.Text);
+		}
+
+		private void clearButton_Click(object sender, EventArgs e)
+		{
+			foreach (var key in _selectedTags.Keys.ToArray())
+			{
+				_selectedTags[key] = new HashSet<string>();
+			}
+			foreach (var control in Controls)
+			{
+				if (control is not SwitchButton button) continue;
+				button.Selected = false;
+				UpdateButton(ref button, (string)button.Tag);
+				UpdateButtonTooltip(ref button, (string)button.Tag);
+			}
 		}
 	}
 }
