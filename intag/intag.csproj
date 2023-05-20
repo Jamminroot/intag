@@ -186,5 +186,10 @@
     <Content Include="Resources\remove.png" />
     <Content Include="intag_512.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="UACHelper">
+      <Version>1.3.0.5</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
