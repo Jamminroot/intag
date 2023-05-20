@@ -7,81 +7,97 @@ using System.Windows.Forms;
 
 namespace intag
 {
-	internal static class Program
-	{
-		private const string BatchFilename = "batch.intag";
-		private const int DefaultLaunchDelay = 300;
-		private static readonly Mutex Mtx = new();
+    internal static class Program
+    {
+        private const string BatchFilename = "batch.intag";
+        private const int DefaultLaunchDelay = 300;
 
-
-		[Conditional("LOGGING")]
-		private static void Log(string message)
-		{
-			var fi = Path.Combine(new FileInfo(Application.ExecutablePath).Directory.FullName, "intag.log");
-			File.AppendAllText( fi, $"{DateTime.Now.ToString("O")}\t{message}{Environment.NewLine}");
+        [Conditional("LOGGING")]
+        private static void Log(string message)
+        {
+            var fi = Path.Combine(new FileInfo(Application.ExecutablePath).Directory.FullName, "intag.log");
+            File.AppendAllText( fi, $"{DateTime.Now:O}\t{message}{Environment.NewLine}");
         }
 
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-		private static void Main(string[] args)
-		{
-			var held = false;
-			try
-			{
-				if (args == null || args.Length == 0)
-				{
+        private static void Main(string[] args)
+        {
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-					RegUtils.Install();
-					Environment.Exit(0);
-				}
-				if (args.Length == 1 && (args[0].Equals("--uninstall", StringComparison.CurrentCultureIgnoreCase) ||
-										 args[0].Equals("-u", StringComparison.CurrentCultureIgnoreCase)))
-				{
-					RegUtils.Uninstall();
-					Environment.Exit(0);
-				}
-				if (!args.Any(arg => Directory.Exists(arg) || File.Exists(arg)))
-				{
-					Environment.Exit(1);
-				}
+                if (args == null || args.Length == 0)
+                {
+                    RegUtils.Install();
+                    Environment.Exit(0);
+                }
+                if (args.Length == 1 && (args[0].Equals("--uninstall", StringComparison.CurrentCultureIgnoreCase) ||
+                                         args[0].Equals("-u", StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    RegUtils.Uninstall();
+                    Environment.Exit(0);
+                }
 
-				var delay = args.Length > 1 ? int.Parse(args.FirstOrDefault(arg => !Directory.Exists(arg) && !File.Exists(arg)) ?? DefaultLaunchDelay.ToString()) : DefaultLaunchDelay;
-				var validObjects = args.Where(arg => Directory.Exists(arg) || File.Exists(arg)).ToArray();
-				
-				//Batching
-				Mtx.WaitOne();
-				held = true;
-				if (File.Exists(BatchFilename))
-				{
-					File.AppendAllText(BatchFilename, Environment.NewLine + validObjects[0]);
-					Mtx.ReleaseMutex();
-					held = false;
-					return;
-				}
-				File.WriteAllText(BatchFilename, validObjects[0]);
-				Mtx.ReleaseMutex();
-				held = false;
-				Thread.Sleep(delay);
-				var batch = File.ReadAllLines(BatchFilename);
-				File.Delete(BatchFilename);
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
-				Log($"Launching with batch: [{string.Join(", ", batch)}]");
-				Application.Run(new MainForm(batch));
-			}
-			catch (Exception e)
-			{
+                var validObjects = args.Where(arg => Directory.Exists(arg) || File.Exists(arg)).ToArray();
 
-				Log($"Caught exception:\n{e}");
-				throw;
-				//Ignored for now
-			}
-			finally
-			{
-				if (held) Mtx.ReleaseMutex();
-			}
-		}
-	}
+                if (validObjects.Length == 0)
+                {
+                    MessageBox.Show("No existing files or folders are passed in a command line.", "InTag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Environment.Exit(1);
+                }
+
+                var delay = args.Length > 1 ? int.Parse(args.Except(validObjects).FirstOrDefault() ?? DefaultLaunchDelay.ToString()) : DefaultLaunchDelay;
+
+                using var mtx = new Mutex(false, "InTagMutex");
+                //Batching
+                mtx.WaitOne();
+
+                if (File.Exists(BatchFilename))
+                {
+                    File.AppendAllText(BatchFilename, Environment.NewLine + validObjects[0]);
+                    mtx.ReleaseMutex();
+                    return;
+                }
+                File.WriteAllText(BatchFilename, validObjects[0]);
+                mtx.ReleaseMutex();
+
+                var ourName = Process.GetCurrentProcess().ProcessName;
+                var start = DateTime.Now;
+                var emergencyExit = false;
+                do
+                {
+                    Thread.Sleep(delay);
+                    if (DateTime.Now - start > TimeSpan.FromSeconds(5))
+                    {
+                        switch(MessageBox.Show("Timeout for waiting of another InTag process.", "InTag", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning))
+                        {
+                            case DialogResult.Abort:
+                                if (File.Exists(BatchFilename)) File.Delete(BatchFilename);
+                                return;
+                            case DialogResult.Retry:
+                                start = DateTime.Now;
+                                break;
+                            case DialogResult.Ignore:
+                                emergencyExit = true;
+                                break;
+                        }
+                    }
+                } while(Process.GetProcessesByName(ourName).Length > 1 || emergencyExit);
+
+                var batch = File.ReadAllLines(BatchFilename);
+                File.Delete(BatchFilename);
+                Log($"Launching with batch: [{string.Join(", ", batch)}]");
+                Application.Run(new MainForm(batch));
+            }
+            catch (Exception e)
+            {
+                Log($"Caught exception:\n{e}");
+                MessageBox.Show(e.Message, "InTag", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
 }
