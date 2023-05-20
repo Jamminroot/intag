@@ -17,11 +17,12 @@ namespace intag
         /// <summary>
         /// Key is object, value is tags assigned to it
         /// </summary>
-        private static Dictionary<string, HashSet<string>> _selectedTags;
-        private static Dictionary<string, HashSet<string>> _selectedTagsOnLoad;
+        private static Dictionary<string, SortedSet<string>> _selectedTags;
+        private static Dictionary<string, SortedSet<string>> _selectedTagsOnLoad;
         private static string[] _objects;
         private List<SwitchButton> _buttons = new();
-        private static List<string> _tagOptions;
+        private static SortedSet<string> _tagOptions;
+
         public MainForm(string[] batch)
         {
             _objects = batch.Where(b=>!string.IsNullOrWhiteSpace(b)).ToArray();
@@ -36,7 +37,7 @@ namespace intag
                 ToolTipHint.SetToolTip(selectedObjectsLabel, string.Join("\n", _objects));
             }
             _selectedTags = FileUtils.GetObjectsTags(_objects);
-            _selectedTagsOnLoad = _selectedTags.ToDictionary(entry => entry.Key, entry => new HashSet<string>(entry.Value));
+            _selectedTagsOnLoad = _selectedTags.ToDictionary(entry => entry.Key, entry => new SortedSet<string>(entry.Value));
 
             _tagOptions = FileUtils.GetNearbyTags(_objects[0]);
             var tagIndex = 0;
@@ -124,7 +125,7 @@ namespace intag
                 }
                 else
                 {
-                    _selectedTags[obj] = new HashSet<string> {tag};
+                    _selectedTags[obj] = new SortedSet<string> {tag};
                 }
             }
         }
@@ -242,7 +243,7 @@ namespace intag
         {
             foreach (var key in _selectedTags.Keys.ToArray())
             {
-                _selectedTags[key] = new HashSet<string>();
+                _selectedTags[key] = new SortedSet<string>();
             }
             foreach (var control in Controls)
             {
