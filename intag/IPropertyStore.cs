@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-
 namespace intag
 {
 	/// <summary>A property store</summary>

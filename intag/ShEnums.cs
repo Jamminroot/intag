@@ -2,20 +2,20 @@ using System;
 
 namespace intag
 {
-		internal enum ShellItemDesignNameOptions
-		{
-			Normal = 0x00000000,           // SIGDN_NORMAL
-			ParentRelativeParsing = unchecked((int)0x80018001),   // SIGDN_INFOLDER | SIGDN_FORPARSING
-			DesktopAbsoluteParsing = unchecked((int)0x80028000),  // SIGDN_FORPARSING
-			ParentRelativeEditing = unchecked((int)0x80031001),   // SIGDN_INFOLDER | SIGDN_FOREDITING
-			DesktopAbsoluteEditing = unchecked((int)0x8004c000),  // SIGDN_FORPARSING | SIGDN_FORADDRESSBAR
-			FileSystemPath = unchecked((int)0x80058000),             // SIGDN_FORPARSING
-			Url = unchecked((int)0x80068000),                     // SIGDN_FORPARSING
-			ParentRelativeForAddressBar = unchecked((int)0x8007c001),     // SIGDN_INFOLDER | SIGDN_FORPARSING | SIGDN_FORADDRESSBAR
-			ParentRelative = unchecked((int)0x80080001)           // SIGDN_INFOLDER
-		}
-		
-		[Flags]
+        internal enum ShellItemDesignNameOptions
+        {
+            Normal = 0x00000000,           // SIGDN_NORMAL
+            ParentRelativeParsing = unchecked((int)0x80018001),   // SIGDN_INFOLDER | SIGDN_FORPARSING
+            DesktopAbsoluteParsing = unchecked((int)0x80028000),  // SIGDN_FORPARSING
+            ParentRelativeEditing = unchecked((int)0x80031001),   // SIGDN_INFOLDER | SIGDN_FOREDITING
+            DesktopAbsoluteEditing = unchecked((int)0x8004c000),  // SIGDN_FORPARSING | SIGDN_FORADDRESSBAR
+            FileSystemPath = unchecked((int)0x80058000),             // SIGDN_FORPARSING
+            Url = unchecked((int)0x80068000),                     // SIGDN_FORPARSING
+            ParentRelativeForAddressBar = unchecked((int)0x8007c001),     // SIGDN_INFOLDER | SIGDN_FORPARSING | SIGDN_FORADDRESSBAR
+            ParentRelative = unchecked((int)0x80080001)           // SIGDN_INFOLDER
+        }
+
+        [Flags]
         internal enum ShellFileGetAttributesOptions
         {
             /// <summary>The specified items can be copied.</summary>
@@ -151,7 +151,7 @@ namespace intag
             /// </summary>
             PkeyMask = unchecked((int)0x81044000),
         }
-        
+
         /// <summary>
         /// Indicate flags that modify the property store object retrieved by methods that create a property store, such as
         /// IShellItem2::GetPropertyStore or IPropertyStoreFactory::GetPropertyStore.
@@ -260,5 +260,4 @@ namespace intag
             /// <summary>Mask for valid GETPROPERTYSTOREFLAGS values.</summary>
             MaskValid = 0xff,
         }
-
 }

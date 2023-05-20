@@ -8,7 +8,6 @@ namespace intag
    [StructLayout(LayoutKind.Explicit)]
     public sealed class PropVar : IDisposable
     {
-        
         [DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true, PreserveSig = false)]
         internal static extern void InitPropVariantFromBooleanVector([In, MarshalAs(UnmanagedType.LPArray)] bool[] prgf, uint cElems, [Out] PropVar ppropvar);
 
@@ -104,7 +103,7 @@ namespace intag
 
         [DllImport("OleAut32.dll", PreserveSig = false)] // returns hresult
         internal static extern void SafeArrayUnaccessData(IntPtr psa);
-        
+
         [StructLayout(LayoutKind.Sequential)]
         private struct Blob
         {
