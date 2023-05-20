@@ -6,34 +6,33 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace intag
 {
-	internal enum SICHINTF
-	{
-		SICHINT_DISPLAY = 0x00000000,
-		SICHINT_CANONICAL = 0x10000000,
-		SICHINT_TEST_FILESYSPATH_IF_NOT_EQUAL = 0x20000000,
-		SICHINT_ALLFIELDS = unchecked((int)0x80000000)
-	}
+    internal enum SICHINTF
+    {
+        SICHINT_DISPLAY = 0x00000000,
+        SICHINT_CANONICAL = 0x10000000,
+        SICHINT_TEST_FILESYSPATH_IF_NOT_EQUAL = 0x20000000,
+        SICHINT_ALLFIELDS = unchecked((int)0x80000000)
+    }
 
-	[ComImport]
-	[Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IShellItem
-	{
-		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-		void GetParent([MarshalAs(UnmanagedType.Interface)] out IShellItem ppsi);
+    [ComImport]
+    [Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal interface IShellItem
+    {
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        void GetParent([MarshalAs(UnmanagedType.Interface)] out IShellItem ppsi);
 
-		[PreserveSig]
-		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-		HRes Compare([In] [MarshalAs(UnmanagedType.Interface)] IShellItem psi, [In] SICHINTF hint, out int piOrder);
-	}
+        [PreserveSig]
+        [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+        HRes Compare([In] [MarshalAs(UnmanagedType.Interface)] IShellItem psi, [In] SICHINTF hint, out int piOrder);
+    }
 
-	[ComImport]
-	[Guid("7E9FB0D3-919F-4307-AB2E-9B1860310C93")]
-	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-	internal interface IShellItem2 : IShellItem
-	{
-		
-		 // Not supported: IBindCtx.
+    [ComImport]
+    [Guid("7E9FB0D3-919F-4307-AB2E-9B1860310C93")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    internal interface IShellItem2 : IShellItem
+    {
+         // Not supported: IBindCtx.
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HRes BindToHandler(
@@ -103,5 +102,5 @@ namespace intag
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetBool([In] ref PropertyKey key, out int pf);
-	}
+    }
 }

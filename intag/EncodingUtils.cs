@@ -19,19 +19,17 @@ namespace intag
 
 		    // First check the low hanging fruit by checking if a
 		    // BOM/signature exists (sourced from http://www.unicode.org/faq/utf_bom.html#bom4)
-		    if (b.Length >= 4 && b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF) { text = Encoding.GetEncoding("utf-32BE").GetString(b, 4, b.Length - 4); return Encoding.GetEncoding("utf-32BE"); }  // UTF-32, big-endian 
+		    if (b.Length >= 4 && b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF) { text = Encoding.GetEncoding("utf-32BE").GetString(b, 4, b.Length - 4); return Encoding.GetEncoding("utf-32BE"); }  // UTF-32, big-endian
 		    else if (b.Length >= 4 && b[0] == 0xFF && b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00) { text = Encoding.UTF32.GetString(b, 4, b.Length - 4); return Encoding.UTF32; }    // UTF-32, little-endian
 		    else if (b.Length >= 2 && b[0] == 0xFE && b[1] == 0xFF) { text = Encoding.BigEndianUnicode.GetString(b, 2, b.Length - 2); return Encoding.BigEndianUnicode; }     // UTF-16, big-endian
 		    else if (b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE) { text = Encoding.Unicode.GetString(b, 2, b.Length - 2); return Encoding.Unicode; }              // UTF-16, little-endian
 		    else if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) { text = Encoding.UTF8.GetString(b, 3, b.Length - 3); return Encoding.UTF8; } // UTF-8
 		    else if (b.Length >= 3 && b[0] == 0x2b && b[1] == 0x2f && b[2] == 0x76) { text = Encoding.UTF7.GetString(b,3,b.Length-3); return Encoding.UTF7; } // UTF-7
 
-		        
 		    // If the code reaches here, no BOM/signature was found, so now
 		    // we need to 'taste' the file to see if can manually discover
 		    // the encoding. A high taster value is desired for UTF-8
 		    if (taster == 0 || taster > b.Length) taster = b.Length;    // Taster size can't be bigger than the filesize obviously.
-
 
 		    // Some text files are encoded in UTF8, but have no BOM/signature. Hence
 		    // the below manually checks for a UTF8 pattern. This code is based off
@@ -44,7 +42,7 @@ namespace intag
 		    int i = 0;
 		    bool utf8 = false;
 		    while (i < taster - 4)
-		    { 
+		    {
 		        if (b[i] <= 0x7F) { i += 1; continue; }     // If all characters are below 0x80, then it is valid UTF8, but UTF8 is not 'required' (and therefore the text is more desirable to be treated as the default codepage of the computer). Hence, there's no "utf8 = true;" code unlike the next three checks.
 		        if (b[i] >= 0xC2 && b[i] < 0xE0 && b[i + 1] >= 0x80 && b[i + 1] < 0xC0) { i += 2; utf8 = true; continue; }
 		        if (b[i] >= 0xE0 && b[i] < 0xF0 && b[i + 1] >= 0x80 && b[i + 1] < 0xC0 && b[i + 2] >= 0x80 && b[i + 2] < 0xC0) { i += 3; utf8 = true; continue; }
@@ -56,10 +54,9 @@ namespace intag
 		        return Encoding.UTF8;
 		    }
 
-
 		    // The next check is a heuristic attempt to detect UTF-16 without a BOM.
 		    // We simply look for zeroes in odd or even byte places, and if a certain
-		    // threshold is reached, the code is 'probably' UF-16.          
+		    // threshold is reached, the code is 'probably' UF-16.
 		    double threshold = 0.1; // proportion of chars step 2 which must be zeroed to be diagnosed as utf-16. 0.1 = 10%
 		    int count = 0;
 		    for (int n = 0; n < taster; n += 2) if (b[n] == 0) count++;
@@ -67,7 +64,6 @@ namespace intag
 		    count = 0;
 		    for (int n = 1; n < taster; n += 2) if (b[n] == 0) count++;
 		    if (((double)count) / taster > threshold) { text = Encoding.Unicode.GetString(b); return Encoding.Unicode; } // (little-endian)
-
 
 		    // Finally, a long shot - let's see if we can find "charset=xyz" or
 		    // "encoding=xyz" to identify the encoding:
@@ -93,7 +89,7 @@ namespace intag
 		            catch { break; }    // If C# doesn't recognize the name of the encoding, break.
 		        }
 		    }
-		    
+
 		    // If all else fails, the encoding is probably (though certainly not
 		    // definitely) the user's local codepage! One might present to the user a
 		    // list of alternative encodings as shown here: https://stackoverflow.com/questions/8509339/what-is-the-most-common-encoding-of-each-language
@@ -101,6 +97,5 @@ namespace intag
 		    text = Encoding.Default.GetString(b);
 		    return Encoding.Default;
 		}
-		
 	}
 }
