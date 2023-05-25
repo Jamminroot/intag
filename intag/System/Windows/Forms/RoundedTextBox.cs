@@ -2,17 +2,16 @@
 {
     internal class RoundedTextBox : TextBox
     {
-
         [System.Runtime.InteropServices.DllImport("gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
         private static extern IntPtr CreateRoundRectRgn
         (
-            int nLeftRect,  
-            int nTopRect,   
-            int nRightRect, 
+            int nLeftRect,
+            int nTopRect,
+            int nRightRect,
             int nBottomRect,
-                            
+
             int nHeightRect,
-            int nWeightRect 
+            int nWeightRect
         );
 
         protected override void OnResize(EventArgs e)

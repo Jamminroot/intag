@@ -23,7 +23,9 @@ To use InTag, follow these steps:
 
 ![Main Window Example](images/Window.png)
 
-3. Once you have assigned the tags, click back to the folder or press the esc key. The tags will be assigned, but it may take some time for explorer to detect the changes.
+3. Once you have assigned the tags, click back to the folder or press the enter key to apply the changes. The tags will be assigned, but it may take some time for explorer to detect the changes. To cancel press the esc key. 
+
+   NB. The tag input field should be focused and empty for the enter key worked.
 
 ![Tagged Folders Example](images/Result.png)
 

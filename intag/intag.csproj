@@ -106,12 +106,14 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileUtils.cs" />
     <Compile Include="HRes.cs" />
     <Compile Include="IPropertyStore.cs" />
     <Compile Include="IShellItem2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PropertyKey.cs" />
     <Compile Include="PropVar.cs" />
+    <Compile Include="RegUtils.cs" />
     <Compile Include="ShEnums.cs" />
     <Compile Include="EncodingUtils.cs" />
     <Compile Include="FileUtils.cs">
