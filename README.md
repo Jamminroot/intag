@@ -77,6 +77,10 @@ There are two methods for uninstalling InTag:
 1. Via argument: Run the exe file with the `--uninstall` or `-u` argument.
 2. Manually: Remove the `HKEY_CLASSES_ROOT\Folder\shell\InTag` and(or) `HKEY_CLASSES_ROOT\*\shell\InTag` entries.
 
+## Contributions
+
+[montoner0](https://github.com/montoner0) - great PR with bunch of improvements and fixes, also nice suggestions
+
 ## Third-Party Notice
 
 The code for individual file management was taken from the Windows API Code Pack.
