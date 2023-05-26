@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -23,6 +26,7 @@ namespace intag
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
+        [RequiresAssemblyFiles("Calls System.Reflection.Assembly.Location")]
         private static void Main(string[] args)
         {
             try
@@ -32,13 +36,35 @@ namespace intag
 
                 if (args == null || args.Length == 0)
                 {
-                    RegUtils.Install();
+                    if (UACHelper.UACHelper.IsElevated)
+                    {
+                        RegUtils.Install();
+                        MessageBox.Show("InTag is installed.", "InTag", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        UACHelper.UACHelper.StartElevated(new ProcessStartInfo(Application.ExecutablePath)
+                        {
+                            UseShellExecute = true
+                        });
+                    }
                     Environment.Exit(0);
                 }
                 if (args.Length == 1 && (args[0].Equals("--uninstall", StringComparison.CurrentCultureIgnoreCase) ||
                                          args[0].Equals("-u", StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    RegUtils.Uninstall();
+                    if (UACHelper.UACHelper.IsElevated)
+                    {
+                        RegUtils.Uninstall();
+                        MessageBox.Show("InTag is uninstalled.", "InTag", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        UACHelper.UACHelper.StartElevated(new ProcessStartInfo(Application.ExecutablePath, "-u")
+                        {
+                            UseShellExecute = true
+                        });
+                    }
                     Environment.Exit(0);
                 }
 
@@ -92,6 +118,10 @@ namespace intag
                 File.Delete(BatchFilename);
                 Log($"Launching with batch: [{string.Join(", ", batch)}]");
                 Application.Run(new MainForm(batch));
+            }
+            catch(Win32Exception e) when (e.NativeErrorCode == 1223)
+            {
+                // user has canceled the elevation
             }
             catch (Exception e)
             {

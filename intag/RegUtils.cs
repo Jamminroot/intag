@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Windows.Forms;
 using Microsoft.Win32;
 
 namespace intag
@@ -13,7 +14,7 @@ namespace intag
             var subKeyIcon = Registry.ClassesRoot.OpenSubKey($@"{ext}\shell\{Constants.RegistryName}", true)
                 ?? throw new ApplicationException("Cannot open shell registry key");
 
-            var loc = Assembly.GetEntryAssembly()?.Location;
+            var loc = Application.ExecutablePath;
             if (loc == null)
             {
                 subKey.Close();
