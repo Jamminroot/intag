@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "intag": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\temp\\test1"
+    }
+  }
+}

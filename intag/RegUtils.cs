@@ -32,6 +32,29 @@ namespace intag
             subKey.Close();
         }
 
+        private static bool TryGetSystemColor(string colorName, out System.Drawing.Color color)
+        {
+            color = System.Drawing.Color.Empty;
+            var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\DWM");
+            if (key == null)
+            {
+                return false;
+            }
+            
+            color = System.Drawing.Color.FromArgb((int)key.GetValue(colorName));
+            return true;
+        }
+        
+        public static bool TryGetSystemAccentColor(out System.Drawing.Color color)
+        {
+            return TryGetSystemColor("AccentColor", out color);
+        }
+        
+        public static bool TryGetSystemColorizationColor(out System.Drawing.Color color)
+        {
+            return TryGetSystemColor("ColorizationColor", out color);
+        }
+        
         private static void InstallFiles() => InstallExtension("*");
         private static void InstallFolder() => InstallExtension("Folder");
 

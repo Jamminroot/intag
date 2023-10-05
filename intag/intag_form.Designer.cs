@@ -46,6 +46,7 @@ namespace intag
             this.selectedObjectsLabel.AutoSize = true;
             this.selectedObjectsLabel.Font = new System.Drawing.Font("Calibri", 9.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.selectedObjectsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(143)))));
+            this.selectedObjectsLabel.BackColor = System.Drawing.Color.Transparent;
             this.selectedObjectsLabel.Location = new System.Drawing.Point(10, 7);
             this.selectedObjectsLabel.Name = "selectedObjectsLabel";
             this.selectedObjectsLabel.Size = new System.Drawing.Size(54, 15);
@@ -73,7 +74,8 @@ namespace intag
             this.addButton.FlatAppearance.BorderSize = 0;
             this.addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.addButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.addButton.ForeColor = System.Drawing.SystemColors.Info;
+            this.addButton.ForeColor = System.Drawing.Color.Transparent;
+            this.addButton.BackColor = System.Drawing.Color.Transparent;
             this.addButton.Image = global::intag.Properties.Resources.add;
             this.addButton.Location = new System.Drawing.Point(201, 25);
             this.addButton.Name = "addButton";
@@ -81,6 +83,8 @@ namespace intag
             this.addButton.TabIndex = 5;
             this.addButton.UseVisualStyleBackColor = true;
             this.addButton.Click += new System.EventHandler(this.addButton_Click);
+            this.addButton.MouseEnter += new System.EventHandler(this.addButton_MouseEnter);
+            this.addButton.MouseLeave += new System.EventHandler(this.addButton_MouseLeave);
 
             // 
             // clearButton
@@ -88,7 +92,8 @@ namespace intag
             this.clearButton.FlatAppearance.BorderSize = 0;
             this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.clearButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.clearButton.ForeColor = System.Drawing.SystemColors.Info;
+            this.clearButton.ForeColor = System.Drawing.Color.Transparent;
+            this.clearButton.BackColor = System.Drawing.Color.Transparent;
             this.clearButton.Image = global::intag.Properties.Resources.remove;
             this.clearButton.Location = new System.Drawing.Point(228, 25);
             this.clearButton.Name = "clearButton";
@@ -96,6 +101,8 @@ namespace intag
             this.clearButton.TabIndex = 6;
             this.clearButton.UseVisualStyleBackColor = true;
             this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
+            this.clearButton.MouseEnter += new System.EventHandler(this.clearButton_MouseEnter);
+            this.clearButton.MouseLeave += new System.EventHandler(this.clearButton_MouseLeave);
 
             // 
             // MainForm
@@ -112,6 +119,8 @@ namespace intag
             this.Controls.Add(this.selectedObjectsLabel);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "MainForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

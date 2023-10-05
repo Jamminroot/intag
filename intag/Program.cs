@@ -3,37 +3,33 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace intag
 {
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     internal static class Program
     {
-        private const string BatchFilename = "batch.intag";
+        private const int MMF_MAX_SIZE = 4096; // 4KB
         private const int DefaultLaunchDelay = 300;
 
-        [Conditional("LOGGING")]
+        [Conditional("DEBUG")]
         private static void Log(string message)
         {
+            Debug.WriteLine(message);
             var fi = Path.Combine(new FileInfo(Application.ExecutablePath).Directory.FullName, "intag.log");
             File.AppendAllText( fi, $"{DateTime.Now:O}\t{message}{Environment.NewLine}");
         }
 
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
         [STAThread]
-        [RequiresAssemblyFiles("Calls System.Reflection.Assembly.Location")]
         private static void Main(string[] args)
         {
             try
             {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
                 if (args == null || args.Length == 0)
                 {
                     if (UACHelper.UACHelper.IsElevated)
@@ -69,59 +65,72 @@ namespace intag
                 }
 
                 var validObjects = args.Where(arg => Directory.Exists(arg) || File.Exists(arg)).ToArray();
-
+                var delay = args.Length > 1 ? int.Parse(args.Except(validObjects).FirstOrDefault() ?? DefaultLaunchDelay.ToString()) : DefaultLaunchDelay;
+                
                 if (validObjects.Length == 0)
                 {
                     MessageBox.Show("No existing files or folders are passed in a command line.", "InTag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     Environment.Exit(1);
                 }
 
-                var delay = args.Length > 1 ? int.Parse(args.Except(validObjects).FirstOrDefault() ?? DefaultLaunchDelay.ToString()) : DefaultLaunchDelay;
+                using var mtx = new Mutex(false, "InTagMutex", out var createdNew);
+                using var mmf = MemoryMappedFile.CreateOrOpen("InTagMemoryMap", MMF_MAX_SIZE + 4);
 
-                using var mtx = new Mutex(false, "InTagMutex");
-                //Batching
                 mtx.WaitOne();
 
-                if (File.Exists(BatchFilename))
+                using (var accessor = mmf.CreateViewAccessor())
                 {
-                    File.AppendAllText(BatchFilename, Environment.NewLine + validObjects[0]);
-                    mtx.ReleaseMutex();
+                    var tempArray = new byte[MMF_MAX_SIZE];
+                    accessor.ReadArray(0, tempArray, 0, MMF_MAX_SIZE);
+                    var existingData = Encoding.UTF8.GetString(tempArray).TrimEnd('\0');
+                    var newData = string.IsNullOrEmpty(existingData) ? validObjects[0] : existingData + Environment.NewLine + validObjects[0];
+                    var bytes = Encoding.UTF8.GetBytes(newData);
+                    accessor.WriteArray(0, bytes, 0, bytes.Length);
+                }
+
+                mtx.ReleaseMutex();
+                var ourName = Process.GetCurrentProcess().ProcessName;
+                
+                if (createdNew)
+                {
+                    Log("Launched new instance with valid objects: " + string.Join(", ", validObjects));
+                    Thread.Sleep(delay);
+                    var start = DateTime.Now;
+                    while (Process.GetProcessesByName(ourName).Length > 1 && DateTime.Now - start < TimeSpan.FromSeconds(5))
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
+                else
+                {
+                    Log("Appended valid objects to existing instance: " + string.Join(", ", validObjects));
                     return;
                 }
-                File.WriteAllText(BatchFilename, validObjects[0]);
-                mtx.ReleaseMutex();
 
-                var ourName = Process.GetCurrentProcess().ProcessName;
-                var start = DateTime.Now;
-                var emergencyExit = false;
-                do
+                string batchData;
+                using (var accessor = mmf.CreateViewAccessor())
                 {
-                    Thread.Sleep(delay);
-                    if (DateTime.Now - start > TimeSpan.FromSeconds(5))
-                    {
-                        switch(MessageBox.Show("Timeout for waiting of another InTag process.", "InTag", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Warning))
-                        {
-                            case DialogResult.Abort:
-                                if (File.Exists(BatchFilename)) File.Delete(BatchFilename);
-                                return;
-                            case DialogResult.Retry:
-                                start = DateTime.Now;
-                                break;
-                            case DialogResult.Ignore:
-                                emergencyExit = true;
-                                break;
-                        }
-                    }
-                } while(Process.GetProcessesByName(ourName).Length > 1 || emergencyExit);
+                    var tempArray = new byte[MMF_MAX_SIZE];
+                    accessor.ReadArray(0, tempArray, 0, MMF_MAX_SIZE);
+                    batchData = Encoding.UTF8.GetString(tempArray).TrimEnd('\0');
+                }
 
-                var batch = File.ReadAllLines(BatchFilename);
-                File.Delete(BatchFilename);
-                Log($"Launching with batch: [{string.Join(", ", batch)}]");
-                Application.Run(new MainForm(batch));
+                Log($"Launching with batch: [{batchData}]");
+
+                // Clear MMF
+                using (var accessor = mmf.CreateViewAccessor())
+                {
+                    var emptyBytes = new byte[MMF_MAX_SIZE];
+                    accessor.WriteArray(0, emptyBytes, 0, MMF_MAX_SIZE);
+                }
+
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new MainForm(batchData.Split(new[] { Environment.NewLine }, StringSplitOptions.None)));
             }
-            catch(Win32Exception e) when (e.NativeErrorCode == 1223)
+            catch (Win32Exception e) when (e.NativeErrorCode == 1223)
             {
-                // user has canceled the elevation
+                // User has canceled the elevation
             }
             catch (Exception e)
             {

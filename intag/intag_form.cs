@@ -2,256 +2,342 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace intag
 {
-    internal partial class MainForm : Form
-    {
-        private const int WmNclbuttondown = 0xA1;
-        private const int HtCaption = 0x2;
+	internal partial class MainForm : Form
+	{
+		private const int WmNclbuttondown = 0xA1;
+		private const int HtCaption = 0x2;
+		private Color _accentColor = Color.FromArgb(255, 231, 200);
+		private Color _disabledColor = Color.FromArgb(120, 100, 120);
 
-        /// <summary>
-        /// Key is object, value is tags assigned to it
-        /// </summary>
-        private static Dictionary<string, SortedSet<string>> _selectedTags;
-        private static Dictionary<string, SortedSet<string>> _selectedTagsOnLoad;
-        private static string[] _objects;
-        private List<SwitchButton> _buttons = new();
-        private static SortedSet<string> _tagOptions;
+		/// <summary>
+		/// Key is object, value is tags assigned to it
+		/// </summary>
+		private static Dictionary<string, SortedSet<string>> _selectedTags;
 
-        public MainForm(string[] batch)
-        {
-            _objects = batch.Where(b=>!string.IsNullOrWhiteSpace(b)).ToArray();
-            InitializeComponent();
-            if (_objects.Length == 1)
-            {
-                selectedObjectsLabel.Text = _objects[0];
-            }
-            else
-            {
-                selectedObjectsLabel.Text = "Multiselect (" + _objects.Length + ")";
-                ToolTipHint.SetToolTip(selectedObjectsLabel, string.Join("\n", _objects));
-            }
-            _selectedTags = FileUtils.GetObjectsTags(_objects);
-            _selectedTagsOnLoad = _selectedTags.ToDictionary(entry => entry.Key, entry => new SortedSet<string>(entry.Value));
+		private static Dictionary<string, SortedSet<string>> _selectedTagsOnLoad;
+		private static string[] _objects;
+		private static SortedSet<string> _tagOptions;
 
-            _tagOptions = FileUtils.GetNearbyTags(_objects[0]);
-            var tagIndex = 0;
-            foreach (var tagOption in _tagOptions)
-            {
-                tagIndex++;
-                AddDynamicButton(tagIndex, tagOption);
-            }
-            ResizeRedraw = true;
-            AdjustFormHeight();
-        }
+		private enum SelectionState
+		{
+			None,
+			Some,
+			All
+		}
+		
+		protected override void OnHandleCreated(EventArgs e)
+		{
+			WindowUtils.EnableAcrylic(this, Color.Black.WithAlpha(128));
+			base.OnHandleCreated(e);
+		}
 
-        private static bool Changed => !(_selectedTagsOnLoad.All(pair => _selectedTags.ContainsKey(pair.Key) && _selectedTags[pair.Key].SetEquals(pair.Value)) && _selectedTags.All(pair => _selectedTagsOnLoad.ContainsKey(pair.Key) && _selectedTagsOnLoad[pair.Key].SetEquals(pair.Value)));
+		protected override void OnPaintBackground(PaintEventArgs e)
+		{
+			e.Graphics.Clear(Color.Transparent);
+		}
 
-        private void AdjustFormHeight()
-        {
-            Height = 87 + 25 * (_tagOptions.Count / 2 + 2);
-            Refresh();
-        }
+		public MainForm(string[] batch)
+		{
+			if (RegUtils.TryGetSystemColorizationColor(out var accent))
+			{
+				_accentColor = accent;
+				_disabledColor = accent.WithBrightness(0.5f);
+			}
+			_objects = batch.Where(b => !string.IsNullOrWhiteSpace(b)).ToArray();
+			InitializeComponent();
+			if (_objects.Length == 1)
+			{
+				selectedObjectsLabel.Text = _objects[0];
+			}
+			else
+			{
+				selectedObjectsLabel.Text = "Multiselect (" + _objects.Length + ")";
+				ToolTipHint.SetToolTip(selectedObjectsLabel, string.Join("\n", _objects));
+			}
+			_selectedTags = FileUtils.GetObjectsTags(_objects);
+			_selectedTagsOnLoad = _selectedTags.ToDictionary(entry => entry.Key, entry => new SortedSet<string>(entry.Value));
+			_tagOptions = FileUtils.GetNearbyTags(_objects[0]);
+			var tagIndex = 0;
+			foreach (var tagOption in _tagOptions)
+			{
+				tagIndex++;
+				AddDynamicButton(tagIndex, tagOption);
+			}
+			ResizeRedraw = true;
+			AdjustFormHeight();
+		}
 
-        protected override void OnCreateControl()
-        {
-            base.OnCreateControl();
-            Region = Region.FromHrgn(CreateRoundRectRgn(2, 3, Width, Height, 3, 3));
-        }
+		private static bool Changed =>
+			!(_selectedTagsOnLoad.All(pair => _selectedTags.ContainsKey(pair.Key) && _selectedTags[pair.Key].SetEquals(pair.Value)) &&
+			  _selectedTags.All(pair => _selectedTagsOnLoad.ContainsKey(pair.Key) && _selectedTagsOnLoad[pair.Key].SetEquals(pair.Value)));
 
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
+		private void AdjustFormHeight()
+		{
+			Height = 87 + 25 * (_tagOptions.Count / 2 + 2);
+			Refresh();
+		}
 
-        [DllImport("user32.dll")]
-        private static extern bool ReleaseCapture();
+		protected override void OnCreateControl()
+		{
+			base.OnCreateControl();
+			Region = Region.FromHrgn(CreateRoundRectRgn(2, 3, Width, Height, 3, 3));
+		}
 
-        [DllImport("user32.dll")]
-        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+		[DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+		private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
 
-        private static string[] ObjectsWithTag(string tag)
-        {
-            return _selectedTags.Where(sel => sel.Value.Contains(tag)).Select(pair=>pair.Key).ToArray();
-        }
+		[DllImport("user32.dll")]
+		private static extern bool ReleaseCapture();
 
-        private void UpdateButton(ref SwitchButton button, string tag)
-        {
-            var withTag = ObjectsWithTag(tag);
-            if (withTag.Length == _selectedTags.Count)
-            {
-                button.ForeColor = Color.FromArgb(255, 231, 143);
-                button.Text = tag;
-            }
-            else if (withTag.Length > 0)
-            {
-                button.ForeColor = Color.FromArgb(255, 231, 143);
-                button.Text = $"{tag} (x{withTag.Length})";
-            }
-            else
-            {
-                button.ForeColor = Color.FromArgb(200, 180, 180);
-                button.Text = tag;
-            }
-        }
+		[DllImport("user32.dll")]
+		private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+		
+		private static string[] ObjectsWithTag(string tag)
+		{
+			return _selectedTags.Where(sel => sel.Value.Contains(tag)).Select(pair => pair.Key).ToArray();
+		}
 
-        private void UpdateButtonTooltip(ref SwitchButton button, string tag)
-        {
-            var withTag = ObjectsWithTag(tag);
-            if (withTag.Length == _selectedTags.Count)
-            {
-                ToolTipHint.SetToolTip(button, "[All objects]");
-            }
-            else if (withTag.Length > 0)
-            {
-                ToolTipHint.SetToolTip(button, string.Join("\n", withTag));;
-            }
-            else
-            {
-                ToolTipHint.SetToolTip(button, "[None]");
-            }
-        }
+		private static SelectionState TagState(string tag, out string[] withTag)
+		{
+			withTag = ObjectsWithTag(tag);
+			if (withTag.Length == _selectedTags.Count)
+			{
+				return SelectionState.All;
+			}
+			return withTag.Length > 0 ? SelectionState.Some : SelectionState.None;
+			
+		}
+		
+		private void UpdateButton(Control button, string tag)
+		{
+			var state = TagState(tag, out var withTag);
+			switch (state)
+			{
+				case SelectionState.All:
+					button.ForeColor = _accentColor;
+					button.Text = tag;
+					break;
+				case SelectionState.Some:
+					button.ForeColor = _accentColor;
+					button.Text = $"{tag} (x{withTag.Length})";
+					break;
+				case SelectionState.None:
+				default:
+					button.ForeColor = _disabledColor;
+					button.Text = tag;
+					break;
+			}
+		}
 
-        private void SelectTagOption(string tag)
-        {
-            foreach (var obj in _objects)
-            {
-                if (_selectedTags.ContainsKey(obj))
-                {
-                    _selectedTags[obj].Add(tag);
-                }
-                else
-                {
-                    _selectedTags[obj] = new SortedSet<string> {tag};
-                }
-            }
-        }
+		private void UpdateButtonTooltip(Control button, string tag)
+		{
+			var state = TagState(tag, out var withTag);
+			switch (state)
+			{
+				case SelectionState.All:
+					ToolTipHint.SetToolTip(button, "[All objects]");
+					break;
+				case SelectionState.Some:
+					ToolTipHint.SetToolTip(button, string.Join("\n", withTag));
+					break;
+				case SelectionState.None:
+					default:
+					ToolTipHint.SetToolTip(button, "[None]");
+					break;
+					
+			}
+		}
 
-        private void AddDynamicButton(int index, string tag, bool selected = false)
-        {
-            var newButton = new SwitchButton
-            {
-                Text = tag,
-                Location = new Point(10 + index % 2 * 120, 80 + ((index - 1) / 2 - 1) * 25),
-                Size = new Size(115, 23),
-                TabStop = false,
-                FlatStyle = FlatStyle.Flat,
-                FlatAppearance =
-                {
-                    BorderSize = 0
-                },
-                Selected = selected,
-                Tag = tag,
-                Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
-            };
-            if (selected)
-            {
-                SelectTagOption(tag);
-            }
-            newButton.Click += (sender, args) =>
-            {
-                Debug.WriteLine($"Clicked on a button: {tag}");
-                //propertyInputBox.Text = value;
-                var withTag = ObjectsWithTag(tag);
+		private void AssignTagToObjects(string tag)
+		{
+			Debug.WriteLine($"Assigning tag {tag} to {_objects.Length} objects");
+			foreach (var obj in _objects)
+			{
+				if (_selectedTags.ContainsKey(obj))
+				{
+					Debug.WriteLine($"Assigning tag {tag} to {obj}");
+					_selectedTags[obj].Add(tag);
+				}
+				else
+				{
+					Debug.WriteLine($"Assigning tag {tag} to {obj} (new set)");
+					_selectedTags[obj] = new SortedSet<string> { tag };
+				}
+			}
+		}
 
-                if (withTag.Length>0)
-                {
-                    foreach (var pair in _selectedTags)
-                    {
-                        pair.Value.Remove(tag);
-                    }
-                }
-                else
-                {
-                    SelectTagOption(tag);
-                }
-                UpdateButton(ref newButton, tag);
-                UpdateButtonTooltip(ref newButton, tag);
+		private void DeleteTagFromObjects(string tag)
+		{
+			Debug.WriteLine($"Deleting tag {tag} from {_objects.Length} objects");
+			foreach (var obj in _objects)
+			{
+				if (_selectedTags.ContainsKey(obj))
+				{
+					Debug.WriteLine($"Deleting tag {tag} from {obj}");
+					_selectedTags[obj].Remove(tag);
+				}
+			}
+		}
+		
+		private void OnMouseEnter(Button btn, EventArgs e)
+		{
+			btn.BackColor = _accentColor; // or Color.Red or whatever you want
+			btn.ForeColor = Color.White;
+		}
 
-                //IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
-                //Environment.Exit(0);
-            };
-            Controls.Add(newButton);
-            UpdateButton(ref newButton, tag);
-            UpdateButtonTooltip(ref newButton, tag);
-        }
-        private void FormDeactivate(object sender, EventArgs e)
-        {
-            if (Changed) { FileUtils.AssignTags(_selectedTags); }
-            Environment.Exit(1);
-        }
+		
+		private void OnMouseLeave(Button btn, EventArgs e)
+		{
+			btn.BackColor = Color.Transparent;
+			var state = TagState((string)btn.Tag, out _);
+			btn.ForeColor = state == SelectionState.None ? _disabledColor : _accentColor;
+		}
 
-        private void FormMouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button != MouseButtons.Left) return;
-            ReleaseCapture();
-            SendMessage(Handle, WmNclbuttondown, HtCaption, 0);
-        }
+		private void AddDynamicButton(int index, string tag, bool selected = false)
+		{
+			var newButton = new Button
+			{
+				Text = tag,
+				Location = new Point(10 + index % 2 * 120, 80 + ((index - 1) / 2 - 1) * 25),
+				Size = new Size(115, 23),
+				TabStop = false,
+				FlatStyle = FlatStyle.Flat,
+				FlatAppearance = { BorderSize = 0 },
+				BackColor = Color.Transparent,
+				Tag = tag,
+				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
+			};
+			if (selected)
+			{
+				AssignTagToObjects(tag);
+			}
+			newButton.MouseEnter += (sender, args) => OnMouseEnter(newButton, args);
+			newButton.MouseLeave += (sender, args) => OnMouseLeave(newButton, args);
+			newButton.Click += (sender, args) =>
+			{
+				Debug.WriteLine($"Clicked on a button: {tag}");
 
-        private void FormLoad(object sender, EventArgs e)
-        {
-            Left = Cursor.Position.X - Width / 2;
-            Top = Cursor.Position.Y - Height / 2;
-            propertyInputBox.Focus();
-            propertyInputBox.Select();
-        }
+				//propertyInputBox.Text = value;
+				var state = TagState(tag, out _);
+				if (state == SelectionState.None || state == SelectionState.Some)
+				{
+					AssignTagToObjects(tag);
+				}
+				else
+				{
+					DeleteTagFromObjects(tag);
+				}
+				UpdateButton(newButton, tag);
+				UpdateButtonTooltip(newButton, tag);
 
-        private void PropertyInputBoxKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                if (propertyInputBox.Text.Length == 0)
-                    FormDeactivate(sender, e);
+				//IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
+				//Environment.Exit(0);
+			};
+			Controls.Add(newButton);
+			UpdateButton(newButton, tag);
+			UpdateButtonTooltip(newButton, tag);
+		}
 
-                AddTagOption();
-            }
-            if (e.KeyCode == Keys.Escape)
-            {
-                Environment.Exit(0);
-            }
-        }
+		private void FormDeactivate(object sender, EventArgs e)
+		{
+			if (Changed)
+			{
+				FileUtils.AssignTags(_selectedTags);
+			}
+			Environment.Exit(1);
+		}
 
-        private void AddTagOption()
-        {
-            var tag = propertyInputBox.Text;
-            if (!_tagOptions.Contains(tag))
-            {
-                Debug.WriteLine($"Adding new tag {tag}");
-                _tagOptions.Add(tag);
-                AddDynamicButton(_tagOptions.Count, tag, true);
-            }
-            if (_selectedTags.Any(pair=>pair.Value.Contains(tag)) || _tagOptions.Contains(tag))
-            {
-                propertyInputBox.Text = "";
-            }
-        }
+		private void FormMouseDown(object sender, MouseEventArgs e)
+		{
+			if (e.Button != MouseButtons.Left) return;
+			ReleaseCapture();
+			SendMessage(Handle, WmNclbuttondown, HtCaption, 0);
+		}
 
-        private void addButton_Click(object sender, EventArgs e)
-        {
-            AddTagOption();
-        }
+		private void FormLoad(object sender, EventArgs e)
+		{
+			Left = Cursor.Position.X - Width / 2;
+			Top = Cursor.Position.Y - Height / 2;
+			propertyInputBox.Focus();
+			propertyInputBox.Select();
+		}
 
-        private void propertyInputBox_MouseEnter(object sender, EventArgs e)
-        {
-            this.ToolTipHint.SetToolTip(this.propertyInputBox, propertyInputBox.Text);
-        }
+		private void PropertyInputBoxKeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				if (propertyInputBox.Text.Length == 0) FormDeactivate(sender, e);
+				AddTagOption();
+			}
+			if (e.KeyCode == Keys.Escape)
+			{
+				Environment.Exit(0);
+			}
+		}
 
-        private void clearButton_Click(object sender, EventArgs e)
-        {
-            foreach (var key in _selectedTags.Keys.ToArray())
-            {
-                _selectedTags[key] = new SortedSet<string>();
-            }
-            foreach (var control in Controls)
-            {
-                if (control is not SwitchButton button) continue;
-                button.Selected = false;
-                UpdateButton(ref button, (string)button.Tag);
-                UpdateButtonTooltip(ref button, (string)button.Tag);
-            }
-        }
-    }
+		private void AddTagOption()
+		{
+			var tag = propertyInputBox.Text;
+			if (!_tagOptions.Contains(tag))
+			{
+				Debug.WriteLine($"Adding new tag {tag}");
+				_tagOptions.Add(tag);
+				AddDynamicButton(_tagOptions.Count, tag, true);
+			}
+			if (_selectedTags.Any(pair => pair.Value.Contains(tag)) || _tagOptions.Contains(tag))
+			{
+				propertyInputBox.Text = "";
+			}
+		}
+
+		private void addButton_Click(object sender, EventArgs e)
+		{
+			AddTagOption();
+		}
+
+		private void addButton_MouseEnter(object sender, EventArgs e)
+		{
+			addButton.BackColor = _accentColor;
+		}
+
+		private void addButton_MouseLeave(object sender, EventArgs e)
+		{
+			addButton.BackColor = Color.Transparent;
+		}
+
+		private void clearButton_MouseEnter(object sender, EventArgs e)
+		{
+			clearButton.BackColor = _accentColor;
+		}
+
+		private void clearButton_MouseLeave(object sender, EventArgs e)
+		{
+			clearButton.BackColor = Color.Transparent;
+		}
+
+		private void propertyInputBox_MouseEnter(object sender, EventArgs e)
+		{
+			this.ToolTipHint.SetToolTip(this.propertyInputBox, propertyInputBox.Text);
+		}
+
+		private void clearButton_Click(object sender, EventArgs e)
+		{
+			foreach (var key in _selectedTags.Keys.ToArray())
+			{
+				_selectedTags[key] = new SortedSet<string>();
+			}
+			foreach (var control in Controls)
+			{
+				if (control is not Button button) continue;
+				UpdateButton(button, (string)button.Tag);
+				UpdateButtonTooltip(button, (string)button.Tag);
+			}
+		}
+	}
 }
