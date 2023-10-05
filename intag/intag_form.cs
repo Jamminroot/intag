@@ -44,13 +44,15 @@ namespace intag
 
 		public MainForm(string[] batch)
 		{
+			InitializeComponent();
 			if (RegUtils.TryGetSystemColorizationColor(out var accent))
 			{
 				_accentColor = accent;
+				selectedObjectsLabel.ForeColor = _accentColor;
 				_disabledColor = accent.WithBrightness(0.5f);
 			}
 			_objects = batch.Where(b => !string.IsNullOrWhiteSpace(b)).ToArray();
-			InitializeComponent();
+			
 			if (_objects.Length == 1)
 			{
 				selectedObjectsLabel.Text = _objects[0];

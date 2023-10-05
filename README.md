@@ -1,7 +1,8 @@
 # InTag
 
-> POLL📢
-[Update Notification Feature](https://github.com/Jamminroot/intag/discussions/17)
+> POLL📢[Update Notification Feature](https://github.com/Jamminroot/intag/discussions/17)
+
+> PRE-RELEASE [DISCUSSION](https://github.com/Jamminroot/intag/discussions/21)📢
 
 InTag is a tool that allows you to add tags to folders and files from the explorer context menu. It can also scan nearby files and use their tags for convenience. The tool is designed to be small and lightweight.
 
