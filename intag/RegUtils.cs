@@ -28,7 +28,7 @@ namespace intag
             subKeyIcon.SetValue("Icon", loc);
             subKeyIcon.SetValue("MultiSelectModel", "Player");
             subKeyIcon.Close();
-            subKey.SetValue("", loc+" \"%1\"");
+            subKey.SetValue("", loc+"--ui --path \"%1\"");
             subKey.Close();
         }
 

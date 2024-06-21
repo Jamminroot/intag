@@ -30,6 +30,48 @@ namespace intag
                 }
             }
         }
+        
+        public static void AddTags(string[] objects, string[] tags)
+        {
+            var objectTags = new Dictionary<string, SortedSet<string>>();
+            foreach (var obj in objects)
+            {
+                if (File.Exists(obj))
+                {
+                    var fileTags = GetFileTags(obj);
+                    fileTags.UnionWith(tags);
+                    objectTags[obj] = fileTags;
+                }
+                else if (Directory.Exists(obj))
+                {
+                    var folderTags = GetFolderTags(obj);
+                    folderTags.UnionWith(tags);
+                    objectTags[obj] = folderTags;
+                }
+            }
+            AssignTags(objectTags);
+        }
+       
+        public static void RemoveTags(string[] objects, string[] tags)
+        {
+            var objectTags = new Dictionary<string, SortedSet<string>>();
+            foreach (var obj in objects)
+            {
+                if (File.Exists(obj))
+                {
+                    var fileTags = GetFileTags(obj);
+                    fileTags.ExceptWith(tags);
+                    objectTags[obj] = fileTags;
+                }
+                else if (Directory.Exists(obj))
+                {
+                    var folderTags = GetFolderTags(obj);
+                    folderTags.ExceptWith(tags);
+                    objectTags[obj] = folderTags;
+                }
+            }
+            AssignTags(objectTags);
+        }
 
         private static void Unhide(FileInfo fi)
         {
