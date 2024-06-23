@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -22,6 +23,7 @@ namespace intag
         private static void Log(string message)
         {
             Debug.WriteLine(message);
+            Console.WriteLine(message);
             var fi = Path.Combine(new FileInfo(Application.ExecutablePath).Directory.FullName, "intag.log");
             File.AppendAllText( fi, $"{DateTime.Now:O}\t{message}{Environment.NewLine}");
         }
@@ -73,20 +75,28 @@ namespace intag
             return result;
         }
         
+        
         [STAThread]
         private static void Main(string[] args)
         {
             try
             {
-                var parent = ParentProcessUtilities.GetParentProcess().ProcessName;
+                var parent = ParentProcessUtilities.GetParentProcess()?.ProcessName ?? "explorer"; // Workaround for elevation
+                Log("Running from parent: " + parent);
+                if (parent != "explorer")
+                {
+                    ConsoleWindow.Allocate();
+                }
                 if (args == null || args.Length == 0)
                 {
                     if (parent.Equals("explorer", StringComparison.CurrentCultureIgnoreCase))
                     {
+                        Log("Goging to install");
                         HandleExplorerRunNoArgs();
                     }
                     else
                     {
+                        Log("Showing usage");
                         ShowUsage();
                     }
                     Environment.Exit(0);
@@ -100,7 +110,9 @@ namespace intag
                 }
                 
                 var parsedArgs = ParseArgs(args);
-                if (!parsedArgs.ContainsKey("--path") || !parsedArgs.ContainsKey("--list") && (parsedArgs.ContainsKey("--add") || parsedArgs.ContainsKey("--remove")) && !parsedArgs.ContainsKey("--ui"))
+                var isWithTagsModificationFlags = parsedArgs.ContainsKey("--add") || parsedArgs.ContainsKey("--remove");
+                var isObjectsNotSpecified = !parsedArgs.ContainsKey("--path") && !parsedArgs.ContainsKey("--list");
+                if (isWithTagsModificationFlags && isObjectsNotSpecified && !parsedArgs.ContainsKey("--ui"))
                 {
                     ShowUsage();
                     Environment.Exit(1);
@@ -140,8 +152,8 @@ namespace intag
             if (tagsToAdd.Length == 0 && tagsToRemove.Length == 0)
             {
                 var tagsCollection = FileUtils.GetObjectsTags(validObjects);
-                Console.WriteLine("Tags for objects:");
-                Console.WriteLine(string.Join(Environment.NewLine, tagsCollection.Select(kv => $"{kv.Key}: {string.Join(", ", kv.Value)}")));
+                System.Console.WriteLine("Tags for objects:");
+                System.Console.WriteLine(string.Join(Environment.NewLine, tagsCollection.Select(kv => $"{kv.Key}: {string.Join(", ", kv.Value)}")));
                 return false;
             }
             
