@@ -9,8 +9,9 @@ InTag is a tool that allows you to add tags to folders and files from the explor
 - Add tags to folders and files from the explorer context menu
 - Scan nearby files and use their tags for convenience
 - Small and lightweight design
+- *NEW* - added support of CLI usage
 
-## Usage
+## Usage (UI)
 
 To use InTag, follow these steps:
 
@@ -31,6 +32,17 @@ To use InTag, follow these steps:
 ![Tagged Folders Example - 2](images/Result2.png)
 
 4. Ensure that you have enabled grouping by tags by selecting "Context menu on the folder background > group by > More... > Select 'Tags' in the list".
+
+## Usage (CLI)
+
+```ps1
+# Add tags:
+.\intag.exe --add "test_tag" --path "C:\path\to\folder\or\file"
+# Remove tags:
+.\intag.exe --remove "test_tag" --list "C:\path\to\list\file"
+# Add And Remove tags (will combine files in list file and argument of "--path")::
+.\intag.exe  --add "test_tag" --remove "test_tag" --list "C:\path\to\list\file" --path "C:\path\to\folder\or\file"
+```
 
 ## Installation
 
@@ -55,7 +67,7 @@ Windows Registry Editor Version 5.00
 "Icon"="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\""
 
 [HKEY_CLASSES_ROOT\Folder\shell\InTag\command]
-@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" \"%1\""
+@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" --ui --path \"%1\""
 ```
 
 For all files:
@@ -66,7 +78,7 @@ Windows Registry Editor Version 5.00
 "Icon"="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\""
 
 [HKEY_CLASSES_ROOT\*\shell\InTag\command]
-@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" \"%1\""
+@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" --ui --path \"%1\""
 ```
 
 ## Uninstall
