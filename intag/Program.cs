@@ -101,14 +101,14 @@ namespace intag
                     }
                     Environment.Exit(0);
                 }
-                
+
                 if (args!.Length == 1 && (args[0].Equals("--uninstall", StringComparison.CurrentCultureIgnoreCase) ||
-                                         args[0].Equals("-u", StringComparison.CurrentCultureIgnoreCase)))
+                                          args[0].Equals("-u", StringComparison.CurrentCultureIgnoreCase)))
                 {
                     HandleIntagUninstallArg();
                     Environment.Exit(0);
                 }
-                
+
                 var parsedArgs = ParseArgs(args);
                 var isWithTagsModificationFlags = parsedArgs.ContainsKey("--add") || parsedArgs.ContainsKey("--remove");
                 var isObjectsNotSpecified = !parsedArgs.ContainsKey("--path") && !parsedArgs.ContainsKey("--list");
@@ -117,11 +117,11 @@ namespace intag
                     ShowUsage();
                     Environment.Exit(1);
                 }
-                
-                var objects = parsedArgs.Where(p=>p.Key == "--path").Select(p=>p.Value);
-                var joinedList = parsedArgs.Where(p=>p.Key == "--list").Select(p=>p.Value).SelectMany(File.ReadAllLines).ToList();
+
+                var objects = parsedArgs.Where(p => p.Key == "--path").Select(p => p.Value);
+                var joinedList = parsedArgs.Where(p => p.Key == "--list").Select(p => p.Value).SelectMany(File.ReadAllLines).ToList();
                 joinedList.AddRange(objects);
-                
+
                 var validObjects = joinedList.Where(arg => Directory.Exists(arg) || File.Exists(arg)).ToArray();
 
                 if (parsedArgs.ContainsKey("--ui"))
