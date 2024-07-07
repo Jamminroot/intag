@@ -206,8 +206,8 @@ namespace intag
 			var newButton = new Button
 			{
 				Text = tag,
-				Location = new Point(10 + index % 2 * 120, 80 + ((index - 1) / 2 - 1) * 25),
-				Size = new Size(115, 23),
+				Location = new Point(10 + index % 2 * 130, 80 + ((index - 1) / 2 - 1) * 25),
+				Size = new Size(125, 23),
 				TabStop = false,
 				FlatStyle = FlatStyle.Flat,
 				FlatAppearance = { BorderSize = 0 },

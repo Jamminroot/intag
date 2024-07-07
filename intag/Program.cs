@@ -6,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -25,7 +24,10 @@ namespace intag
             Debug.WriteLine(message);
             Console.WriteLine(message);
             var fi = Path.Combine(new FileInfo(Application.ExecutablePath).Directory.FullName, "intag.log");
-            File.AppendAllText( fi, $"{DateTime.Now:O}\t{message}{Environment.NewLine}");
+            var mtx = new Mutex(false, "InTagLogMutex");
+            mtx.WaitOne();
+            File.AppendAllText(fi, $"{DateTime.Now:O}\t{message}{Environment.NewLine}");
+            mtx.ReleaseMutex();
         }
 
         private static void ShowUsage()

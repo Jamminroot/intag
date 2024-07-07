@@ -32,106 +32,106 @@ namespace intag
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.selectedObjectsLabel = new System.Windows.Forms.Label();
-            this.propertyInputBox = new System.Windows.Forms.RoundedTextBox();
-            this.addButton = new System.Windows.Forms.Button();
-            this.ToolTipHint = new System.Windows.Forms.ToolTip(this.components);
-            this.clearButton = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-
+            components = new System.ComponentModel.Container();
+            selectedObjectsLabel = new System.Windows.Forms.Label();
+            propertyInputBox = new System.Windows.Forms.RoundedTextBox();
+            addButton = new System.Windows.Forms.Button();
+            ToolTipHint = new System.Windows.Forms.ToolTip(components);
+            clearButton = new System.Windows.Forms.Button();
+            SuspendLayout();
             // 
             // selectedObjectsLabel
             // 
-            this.selectedObjectsLabel.AutoSize = true;
-            this.selectedObjectsLabel.Font = new System.Drawing.Font("Calibri", 9.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.selectedObjectsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(231)))), ((int)(((byte)(143)))));
-            this.selectedObjectsLabel.BackColor = System.Drawing.Color.Transparent;
-            this.selectedObjectsLabel.Location = new System.Drawing.Point(10, 7);
-            this.selectedObjectsLabel.Name = "selectedObjectsLabel";
-            this.selectedObjectsLabel.Size = new System.Drawing.Size(54, 15);
-            this.selectedObjectsLabel.TabIndex = 4;
-            this.selectedObjectsLabel.Text = "Selected";
-            this.ToolTipHint.SetToolTip(this.selectedObjectsLabel, "SSS");
-
+            selectedObjectsLabel.AutoSize = true;
+            selectedObjectsLabel.BackColor = Color.Transparent;
+            selectedObjectsLabel.Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point);
+            selectedObjectsLabel.ForeColor = Color.FromArgb(255, 231, 143);
+            selectedObjectsLabel.Location = new Point(12, 8);
+            selectedObjectsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            selectedObjectsLabel.Name = "selectedObjectsLabel";
+            selectedObjectsLabel.Size = new Size(54, 15);
+            selectedObjectsLabel.TabIndex = 4;
+            selectedObjectsLabel.Text = "Selected";
+            ToolTipHint.SetToolTip(selectedObjectsLabel, "SSS");
             // 
             // propertyInputBox
             // 
-            this.propertyInputBox.BackColor = System.Drawing.SystemColors.Info;
-            this.propertyInputBox.Font = new System.Drawing.Font("Calibri", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.propertyInputBox.Location = new System.Drawing.Point(10, 25);
-            this.propertyInputBox.MaxLength = 64;
-            this.propertyInputBox.Name = "propertyInputBox";
-            this.propertyInputBox.Size = new System.Drawing.Size(185, 21);
-            this.propertyInputBox.TabIndex = 0;
-            this.propertyInputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PropertyInputBoxKeyDown);
-            this.propertyInputBox.MouseEnter += new System.EventHandler(this.propertyInputBox_MouseEnter);
-
+            propertyInputBox.BackColor = SystemColors.Info;
+            propertyInputBox.Font = new Font("Calibri", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+            propertyInputBox.Location = new Point(12, 29);
+            propertyInputBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            propertyInputBox.MaxLength = 64;
+            propertyInputBox.Name = "propertyInputBox";
+            propertyInputBox.Size = new Size(200, 24);
+            propertyInputBox.TabIndex = 0;
+            propertyInputBox.KeyDown += PropertyInputBoxKeyDown;
+            propertyInputBox.MouseEnter += propertyInputBox_MouseEnter;
             // 
             // addButton
             // 
-            this.addButton.AccessibleRole = System.Windows.Forms.AccessibleRole.ButtonDropDown;
-            this.addButton.FlatAppearance.BorderSize = 0;
-            this.addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.addButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.addButton.ForeColor = System.Drawing.Color.Transparent;
-            this.addButton.BackColor = System.Drawing.Color.Transparent;
-            this.addButton.Image = global::intag.Properties.Resources.add;
-            this.addButton.Location = new System.Drawing.Point(201, 25);
-            this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(21, 21);
-            this.addButton.TabIndex = 5;
-            this.addButton.UseVisualStyleBackColor = true;
-            this.addButton.Click += new System.EventHandler(this.addButton_Click);
-            this.addButton.MouseEnter += new System.EventHandler(this.addButton_MouseEnter);
-            this.addButton.MouseLeave += new System.EventHandler(this.addButton_MouseLeave);
-
+            addButton.AccessibleRole = System.Windows.Forms.AccessibleRole.ButtonDropDown;
+            addButton.BackColor = Color.Transparent;
+            addButton.FlatAppearance.BorderSize = 0;
+            addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            addButton.Font = new Font("Microsoft Sans Serif", 7F, FontStyle.Bold, GraphicsUnit.Point);
+            addButton.ForeColor = Color.Transparent;
+            addButton.Image = Properties.Resources.add;
+            addButton.Location = new Point(217, 26);
+            addButton.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            addButton.Name = "addButton";
+            addButton.Size = new Size(24, 24);
+            addButton.TabIndex = 5;
+            addButton.UseVisualStyleBackColor = true;
+            addButton.Click += addButton_Click;
+            addButton.MouseEnter += addButton_MouseEnter;
+            addButton.MouseLeave += addButton_MouseLeave;
             // 
             // clearButton
             // 
-            this.clearButton.FlatAppearance.BorderSize = 0;
-            this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clearButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.clearButton.ForeColor = System.Drawing.Color.Transparent;
-            this.clearButton.BackColor = System.Drawing.Color.Transparent;
-            this.clearButton.Image = global::intag.Properties.Resources.remove;
-            this.clearButton.Location = new System.Drawing.Point(228, 25);
-            this.clearButton.Name = "clearButton";
-            this.clearButton.Size = new System.Drawing.Size(21, 21);
-            this.clearButton.TabIndex = 6;
-            this.clearButton.UseVisualStyleBackColor = true;
-            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
-            this.clearButton.MouseEnter += new System.EventHandler(this.clearButton_MouseEnter);
-            this.clearButton.MouseLeave += new System.EventHandler(this.clearButton_MouseLeave);
-
+            clearButton.BackColor = Color.Transparent;
+            clearButton.FlatAppearance.BorderSize = 0;
+            clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            clearButton.Font = new Font("Microsoft Sans Serif", 7F, FontStyle.Bold, GraphicsUnit.Point);
+            clearButton.ForeColor = Color.Transparent;
+            clearButton.Image = Properties.Resources.remove;
+            clearButton.Location = new Point(241, 26);
+            clearButton.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            clearButton.Name = "clearButton";
+            clearButton.Size = new Size(24, 24);
+            clearButton.TabIndex = 6;
+            clearButton.UseVisualStyleBackColor = true;
+            clearButton.Click += clearButton_Click;
+            clearButton.MouseEnter += clearButton_MouseEnter;
+            clearButton.MouseLeave += clearButton_MouseLeave;
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(46)))), ((int)(((byte)(46)))));
-            this.ClientSize = new System.Drawing.Size(256, 87);
-            this.ControlBox = false;
-            this.Controls.Add(this.clearButton);
-            this.Controls.Add(this.addButton);
-            this.Controls.Add(this.propertyInputBox);
-            this.Controls.Add(this.selectedObjectsLabel);
-            this.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "MainForm";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "intag";
-            this.TopMost = true;
-            this.Deactivate += new System.EventHandler(this.FormDeactivate);
-            this.Load += new System.EventHandler(this.FormLoad);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FormMouseDown);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoSize = true;
+            BackColor = Color.FromArgb(46, 46, 46);
+            ClientSize = new Size(275, 100);
+            ControlBox = false;
+            Controls.Add(clearButton);
+            Controls.Add(addButton);
+            Controls.Add(propertyInputBox);
+            Controls.Add(selectedObjectsLabel);
+            Cursor = System.Windows.Forms.Cursors.Hand;
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "MainForm";
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            Text = "intag";
+            TopMost = true;
+            Deactivate += FormDeactivate;
+            Load += FormLoad;
+            MouseDown += FormMouseDown;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         private System.Windows.Forms.Button clearButton;
