@@ -11,9 +11,14 @@ namespace intag
 {
     public static class FileUtils
     {
-        static PropertyKey _propertyKey = new ("f29f85e0-4ff9-1068-ab91-08002b27b3d9", 5);
         static Guid _shellItem2Guid = new ("7E9FB0D3-919F-4307-AB2E-9B1860310C93");
         static Guid _propStoreGuid =  new ("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99");
+
+        // Helper to create PropertyKey for a given property ID
+        private static PropertyKey GetPropertyKey(int propertyId)
+        {
+            return new PropertyKey(Constants.MagicGuid.Trim('{', '}'), propertyId);
+        }
 
         public static void AssignTags(Dictionary<string, SortedSet<string>> objectTags)
         {
@@ -108,24 +113,52 @@ namespace intag
 
         public static void AssignTagsToFile(string file, SortedSet<string> tags)
         {
+            AssignPropertyToFile(file, Constants.PID_KEYWORDS, tags.ToArray());
+        }
+
+        // Generic method to assign any property value to a file
+        public static void AssignPropertyToFile(string file, int propertyId, object value)
+        {
             if (!File.Exists(file)) return;
             try
             {
-                if (SHCreateItemFromParsingName(file, IntPtr.Zero, ref _shellItem2Guid, out var shellItem) != 0) throw new SystemException("Failed to create shell item");
-                if (PSGetPropertyKeyFromName(Constants.CanonicalKeywordsName, out var propKey) != 0) throw new SystemException("Failed to create property key");
+                if (SHCreateItemFromParsingName(file, IntPtr.Zero, ref _shellItem2Guid, out var shellItem) != 0)
+                    throw new SystemException("Failed to create shell item");
                 if (shellItem == null) return;
-                using var propVar = new PropVar(tags.ToArray());
-                if(shellItem.GetPropertyStore(GetPropertyStoreOptions.ReadWrite, ref _propStoreGuid, out var propStore)!=0) throw new SystemException("Failed to get property store");
-                propStore.SetValue(ref _propertyKey, propVar);
-                if (propStore.Commit() != HRes.Ok) throw new SystemException("Failed to save tags");
 
-                Marshal.ReleaseComObject(propStore);
+                var propKey = GetPropertyKey(propertyId);
+
+                // Create PropVar based on value type
+                PropVar propVar;
+                if (value is string[] stringArray)
+                    propVar = new PropVar(stringArray);
+                else if (value is string stringValue)
+                    propVar = new PropVar(stringValue);
+                else
+                    throw new ArgumentException($"Unsupported property value type: {value?.GetType()}");
+
+                using (propVar)
+                {
+                    if (shellItem.GetPropertyStore(GetPropertyStoreOptions.ReadWrite, ref _propStoreGuid, out var propStore) != 0)
+                        throw new SystemException("Failed to get property store");
+                    propStore.SetValue(ref propKey, propVar);
+                    if (propStore.Commit() != HRes.Ok)
+                        throw new SystemException("Failed to save property");
+
+                    Marshal.ReleaseComObject(propStore);
+                }
                 Marshal.ReleaseComObject(shellItem);
             }
             catch
             {
                 // ignored
             }
+        }
+
+        // Convenience method for setting single-value string properties
+        public static void AssignStringPropertyToFile(string file, int propertyId, string value)
+        {
+            AssignPropertyToFile(file, propertyId, value ?? string.Empty);
         }
 
         public static SortedSet<string> GetFolderTags(string folder)
@@ -208,25 +241,59 @@ namespace intag
 
         private static SortedSet<string> GetFileTags(string file)
         {
-            if (!File.Exists(file)) return new SortedSet<string>();
+            var result = GetFileProperty(file, Constants.PID_KEYWORDS);
+            if (result is string[] tags && tags.Length > 0)
+                return new SortedSet<string>(tags);
+            return new SortedSet<string>();
+        }
+
+        // Generic method to read any property from a file
+        public static object GetFileProperty(string file, int propertyId)
+        {
+            if (!File.Exists(file)) return null;
             try
             {
-                if (SHCreateItemFromParsingName(file, IntPtr.Zero, ref _shellItem2Guid, out var shellItem) != 0) throw new SystemException("Failed to create shell item");
-                if (PSGetPropertyKeyFromName(Constants.CanonicalKeywordsName, out var propKey) != 0) throw new SystemException("Failed to create property key");
-                if (shellItem == null) return new SortedSet<string>();
+                if (SHCreateItemFromParsingName(file, IntPtr.Zero, ref _shellItem2Guid, out var shellItem) != 0)
+                    throw new SystemException("Failed to create shell item");
+                if (shellItem == null) return null;
+
+                var propKey = GetPropertyKey(propertyId);
                 using var propVar = new PropVar();
-                shellItem.GetProperty(ref propKey, propVar);
-                if(shellItem.GetPropertyStore(GetPropertyStoreOptions.BestEffort, ref _propStoreGuid, out var propStore)!=0) throw new SystemException("Failed to get property store");
-                propStore.GetValue(ref _propertyKey, propVar);
+
+                if (shellItem.GetPropertyStore(GetPropertyStoreOptions.BestEffort, ref _propStoreGuid, out var propStore) != 0)
+                    throw new SystemException("Failed to get property store");
+                propStore.GetValue(ref propKey, propVar);
+
                 Marshal.ReleaseComObject(propStore);
                 Marshal.ReleaseComObject(shellItem);
-                if (propVar.Value is string[] { Length: > 0 } propValues) return new SortedSet<string>(propValues);
+
+                return propVar.Value;
             }
             catch
             {
                 // ignored
             }
-            return new SortedSet<string>();
+            return null;
+        }
+
+        // Convenience method for reading single-value string properties
+        public static string GetFileStringProperty(string file, int propertyId)
+        {
+            var result = GetFileProperty(file, propertyId);
+            return result as string ?? string.Empty;
+        }
+
+        // Get all supported properties for a file
+        public static Dictionary<int, object> GetFileProperties(string file)
+        {
+            var properties = new Dictionary<int, object>();
+            foreach (var pid in new[] { Constants.PID_TITLE, Constants.PID_SUBJECT, Constants.PID_AUTHOR, Constants.PID_KEYWORDS, Constants.PID_COMMENTS })
+            {
+                var value = GetFileProperty(file, pid);
+                if (value != null)
+                    properties[pid] = value;
+            }
+            return properties;
         }
 
         private static bool IsCorrectSectionPresentInDesktopIni(string filePath)

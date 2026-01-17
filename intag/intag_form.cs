@@ -24,6 +24,13 @@ namespace intag
 		private static string[] _objects;
 		private static SortedSet<string> _tagOptions;
 
+		// Tab system
+		private readonly List<Button> _tabButtons = new();
+		private readonly List<Button> _dynamicButtons = new();
+		private int _currentPropertyId = Constants.PID_KEYWORDS;
+		private Dictionary<int, string> _propertyValues = new();
+		private Dictionary<int, string> _originalPropertyValues = new();
+
 		private enum SelectionState
 		{
 			None,
@@ -52,7 +59,7 @@ namespace intag
 				_disabledColor = accent.WithBrightness(0.5f);
 			}
 			_objects = batch.Where(b => !string.IsNullOrWhiteSpace(b)).ToArray();
-			
+
 			if (_objects.Length == 1)
 			{
 				selectedObjectsLabel.Text = _objects[0];
@@ -65,6 +72,10 @@ namespace intag
 			_selectedTags = FileUtils.GetObjectsTags(_objects);
 			_selectedTagsOnLoad = _selectedTags.ToDictionary(entry => entry.Key, entry => new SortedSet<string>(entry.Value));
 			_tagOptions = FileUtils.GetNearbyTags(_objects[0]);
+
+			// Initialize tabbed UI
+			InitializeTabUI();
+
 			var tagIndex = 0;
 			foreach (var tagOption in _tagOptions)
 			{
@@ -75,13 +86,170 @@ namespace intag
 			AdjustFormHeight();
 		}
 
+		private void InitializeTabUI()
+		{
+			// Create tab buttons for each property
+			var propertyIds = new[] { Constants.PID_KEYWORDS, Constants.PID_TITLE, Constants.PID_SUBJECT, Constants.PID_AUTHOR, Constants.PID_COMMENTS };
+			var tabNames = new[] { "Tags", "Title", "Subj", "Author", "Cmts" };
+			var xPos = 12;
+
+			for (var i = 0; i < propertyIds.Length; i++)
+			{
+				var propId = propertyIds[i];
+				var tabBtn = new Button
+				{
+					Text = tabNames[i],
+					Location = new Point(xPos, 55),
+					Size = new Size(50, 18),
+					FlatStyle = FlatStyle.Flat,
+					FlatAppearance = { BorderSize = 1, BorderColor = _accentColor },
+					BackColor = propId == Constants.PID_KEYWORDS ? _accentColor : Color.Transparent,
+					ForeColor = propId == Constants.PID_KEYWORDS ? Color.White : _accentColor,
+					Font = new Font("Calibri", 7F, FontStyle.Bold),
+					TabStop = false,
+					Tag = propId
+				};
+				tabBtn.Click += (s, e) => SwitchToProperty(propId);
+				Controls.Add(tabBtn);
+				_tabButtons.Add(tabBtn);
+				xPos += 52;
+			}
+
+			// Load property values for the first file
+			var firstFile = _objects.FirstOrDefault(o => System.IO.File.Exists(o));
+			if (firstFile != null)
+			{
+				LoadAllPropertyValues(firstFile);
+			}
+		}
+
+		private void LoadAllPropertyValues(string file)
+		{
+			foreach (var pid in new[] { Constants.PID_TITLE, Constants.PID_SUBJECT, Constants.PID_AUTHOR, Constants.PID_COMMENTS })
+			{
+				var value = FileUtils.GetFileStringProperty(file, pid);
+				_propertyValues[pid] = value;
+				_originalPropertyValues[pid] = value;
+			}
+		}
+
+		private void SavePropertyValues()
+		{
+			var files = _objects.Where(System.IO.File.Exists).ToArray();
+			foreach (var file in files)
+			{
+				foreach (var pid in new[] { Constants.PID_TITLE, Constants.PID_SUBJECT, Constants.PID_AUTHOR, Constants.PID_COMMENTS })
+				{
+					if (_propertyValues.TryGetValue(pid, out var newValue) &&
+					    _originalPropertyValues.TryGetValue(pid, out var oldValue) &&
+					    newValue != oldValue)
+					{
+						FileUtils.AssignStringPropertyToFile(file, pid, newValue);
+					}
+				}
+			}
+		}
+
+		private void SwitchToProperty(int propertyId)
+		{
+			// Update tab button styles
+			foreach (var btn in _tabButtons)
+			{
+				var isSelected = (int)btn.Tag == propertyId;
+				btn.BackColor = isSelected ? _accentColor : Color.Transparent;
+				btn.ForeColor = isSelected ? Color.White : _accentColor;
+			}
+
+			// Clear dynamic buttons
+			foreach (var btn in _dynamicButtons)
+			{
+				Controls.Remove(btn);
+				btn.Dispose();
+			}
+			_dynamicButtons.Clear();
+
+			_currentPropertyId = propertyId;
+
+			if (propertyId == Constants.PID_KEYWORDS)
+			{
+				// Tags mode - show nearby tags as buttons
+				propertyInputBox.Text = "";
+				var tagIndex = 0;
+				foreach (var tagOption in _tagOptions)
+				{
+					tagIndex++;
+					AddDynamicButton(tagIndex, tagOption);
+				}
+				// Show add/clear buttons for tags
+				addButton.Visible = true;
+				clearButton.Visible = true;
+			}
+			else
+			{
+				// Single-value property mode - show current value as a button (if set)
+				var currentValue = _propertyValues.GetValueOrDefault(propertyId, "");
+				propertyInputBox.Text = currentValue;
+
+				if (!string.IsNullOrWhiteSpace(currentValue))
+				{
+					AddSingleValueButton(currentValue);
+				}
+				// Hide add/clear buttons for single properties
+				addButton.Visible = false;
+				clearButton.Visible = false;
+			}
+
+			AdjustFormHeight();
+		}
+
+		private void AddSingleValueButton(string value)
+		{
+			var btn = new Button
+			{
+				Text = value.Length > 20 ? value.Substring(0, 17) + "..." : value,
+				Location = new Point(10, 100),
+				Size = new Size(255, 23),
+				TabStop = false,
+				FlatStyle = FlatStyle.Flat,
+				FlatAppearance = { BorderSize = 0 },
+				BackColor = Color.Transparent,
+				ForeColor = _accentColor,
+				Font = new Font("Calibri", 9.25F, FontStyle.Bold, GraphicsUnit.Point, 0),
+				TextAlign = ContentAlignment.MiddleLeft
+			};
+			btn.MouseEnter += (s, e) => { btn.BackColor = _accentColor; btn.ForeColor = Color.White; };
+			btn.MouseLeave += (s, e) => { btn.BackColor = Color.Transparent; btn.ForeColor = _accentColor; };
+			btn.Click += (s, e) =>
+			{
+				// Clear the value
+				_propertyValues[_currentPropertyId] = "";
+				propertyInputBox.Text = "";
+				Controls.Remove(btn);
+				_dynamicButtons.Remove(btn);
+				btn.Dispose();
+				AdjustFormHeight();
+			};
+			ToolTipHint.SetToolTip(btn, $"Click to clear. Full value: {value}");
+			Controls.Add(btn);
+			_dynamicButtons.Add(btn);
+		}
+
 		private static bool Changed =>
 			!(_selectedTagsOnLoad.All(pair => _selectedTags.ContainsKey(pair.Key) && _selectedTags[pair.Key].SetEquals(pair.Value)) &&
 			  _selectedTags.All(pair => _selectedTagsOnLoad.ContainsKey(pair.Key) && _selectedTagsOnLoad[pair.Key].SetEquals(pair.Value)));
 
 		private void AdjustFormHeight()
 		{
-			Height = 87 + 25 * (_tagOptions.Count / 2 + 2);
+			if (_currentPropertyId == Constants.PID_KEYWORDS)
+			{
+				Height = 107 + 25 * (_tagOptions.Count / 2 + 2);  // Tags mode
+			}
+			else
+			{
+				// Single property mode - smaller height
+				var hasValue = !string.IsNullOrWhiteSpace(_propertyValues.GetValueOrDefault(_currentPropertyId, ""));
+				Height = hasValue ? 130 : 107;
+			}
 			Refresh();
 		}
 
@@ -206,7 +374,7 @@ namespace intag
 			var newButton = new Button
 			{
 				Text = tag,
-				Location = new Point(10 + index % 2 * 130, 80 + ((index - 1) / 2 - 1) * 25),
+				Location = new Point(10 + index % 2 * 130, 100 + ((index - 1) / 2 - 1) * 25),  // Adjusted for tab buttons
 				Size = new Size(125, 23),
 				TabStop = false,
 				FlatStyle = FlatStyle.Flat,
@@ -225,7 +393,6 @@ namespace intag
 			{
 				Debug.WriteLine($"Clicked on a button: {tag}");
 
-				//propertyInputBox.Text = value;
 				var state = TagState(tag, out _);
 				if (state == SelectionState.None || state == SelectionState.Some)
 				{
@@ -237,11 +404,9 @@ namespace intag
 				}
 				UpdateButton(newButton, tag);
 				UpdateButtonTooltip(newButton, tag);
-
-				//IniUtils.AssignPropertyToFolder(_folder, value, _oldSetOfTagsAsString);
-				//Environment.Exit(0);
 			};
 			Controls.Add(newButton);
+			_dynamicButtons.Add(newButton);
 			UpdateButton(newButton, tag);
 			UpdateButtonTooltip(newButton, tag);
 		}
@@ -252,6 +417,7 @@ namespace intag
 			{
 				FileUtils.AssignTags(_selectedTags);
 			}
+			SavePropertyValues();
 			Environment.Exit(1);
 		}
 
@@ -275,7 +441,15 @@ namespace intag
 			if (e.KeyCode == Keys.Enter)
 			{
 				if (propertyInputBox.Text.Length == 0) FormDeactivate(sender, e);
-				AddTagOption();
+
+				if (_currentPropertyId == Constants.PID_KEYWORDS)
+				{
+					AddTagOption();
+				}
+				else
+				{
+					SetSinglePropertyValue();
+				}
 			}
 			if (e.KeyCode == Keys.Escape)
 			{
@@ -291,11 +465,32 @@ namespace intag
 				Debug.WriteLine($"Adding new tag {tag}");
 				_tagOptions.Add(tag);
 				AddDynamicButton(_tagOptions.Count, tag, true);
+				AdjustFormHeight();
 			}
 			if (_selectedTags.Any(pair => pair.Value.Contains(tag)) || _tagOptions.Contains(tag))
 			{
 				propertyInputBox.Text = "";
 			}
+		}
+
+		private void SetSinglePropertyValue()
+		{
+			var value = propertyInputBox.Text.Trim();
+			_propertyValues[_currentPropertyId] = value;
+
+			// Refresh the display
+			foreach (var btn in _dynamicButtons.ToList())
+			{
+				Controls.Remove(btn);
+				btn.Dispose();
+			}
+			_dynamicButtons.Clear();
+
+			if (!string.IsNullOrWhiteSpace(value))
+			{
+				AddSingleValueButton(value);
+			}
+			AdjustFormHeight();
 		}
 
 		private void addButton_Click(object sender, EventArgs e)
@@ -330,15 +525,34 @@ namespace intag
 
 		private void clearButton_Click(object sender, EventArgs e)
 		{
-			foreach (var key in _selectedTags.Keys.ToArray())
+			if (_currentPropertyId == Constants.PID_KEYWORDS)
 			{
-				_selectedTags[key] = new SortedSet<string>();
+				// Clear all tags
+				foreach (var key in _selectedTags.Keys.ToArray())
+				{
+					_selectedTags[key] = new SortedSet<string>();
+				}
+				foreach (var btn in _dynamicButtons)
+				{
+					if (btn.Tag is string tag)
+					{
+						UpdateButton(btn, tag);
+						UpdateButtonTooltip(btn, tag);
+					}
+				}
 			}
-			foreach (var control in Controls)
+			else
 			{
-				if (control is not Button button) continue;
-				UpdateButton(button, (string)button.Tag);
-				UpdateButtonTooltip(button, (string)button.Tag);
+				// Clear single property value
+				_propertyValues[_currentPropertyId] = "";
+				propertyInputBox.Text = "";
+				foreach (var btn in _dynamicButtons.ToList())
+				{
+					Controls.Remove(btn);
+					btn.Dispose();
+				}
+				_dynamicButtons.Clear();
+				AdjustFormHeight();
 			}
 		}
 	}

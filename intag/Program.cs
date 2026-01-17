@@ -33,11 +33,23 @@ namespace intag
         private static void ShowUsage()
         {
             Console.WriteLine("Usage:");
-            Console.WriteLine("  intag --add <tag> [--add <tag> ...] --remove <tag> [--remove <tag> ...] --path <file|folder> [--path <file|folder> ...] --list <file>");
+            Console.WriteLine("  intag --add <value> [--add <value> ...] --remove <value> [--remove <value> ...] --path <file|folder> [--path <file|folder> ...] --list <file>");
+            Console.WriteLine("  intag --property <name> --add <value> --path <file>");
             Console.WriteLine("  intag --path <file|folder> [--path <file|folder> ...] --list <file>");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            Console.WriteLine("  --property <name>  Property to modify: tags (default), title, subject, author, comments");
+            Console.WriteLine("  --add <value>      Add value (for tags) or set value (for other properties)");
+            Console.WriteLine("  --remove <value>   Remove value (only for tags)");
+            Console.WriteLine("  --path <path>      File or folder to modify");
+            Console.WriteLine("  --list <file>      File containing list of paths");
+            Console.WriteLine("  --ui               Open the graphical interface");
+            Console.WriteLine();
             Console.WriteLine("Examples:");
             Console.WriteLine("  intag --add tag1 --add tag2 --remove tag3 --path file1.txt --path folder1");
-            Console.WriteLine("  intag --path file1.txt --list filelist.txt"); 
+            Console.WriteLine("  intag --property author --add \"John Doe\" --path document.docx");
+            Console.WriteLine("  intag --property title --add \"My Document\" --path file.txt");
+            Console.WriteLine("  intag --path file1.txt --list filelist.txt");
         }
         
         private static void HandleExplorerRunNoArgs()
@@ -56,21 +68,24 @@ namespace intag
             }
         }
         
-        private static Dictionary<string, string> ParseArgs(string[] args)
+        private static Dictionary<string, List<string>> ParseArgs(string[] args)
         {
-            var result = new Dictionary<string, string>();
+            var result = new Dictionary<string, List<string>>();
             for (var i = 0; i < args.Length; i++)
             {
                 if (args[i].StartsWith("--"))
                 {
                     var key = args[i];
+                    if (!result.ContainsKey(key))
+                        result[key] = new List<string>();
+
                     if (i + 1 >= args.Length || args[i + 1].StartsWith("--"))
                     {
-                        result[key] = string.Empty;
+                        // Flag without value
                         continue;
                     }
                     var value = args[++i];
-                    result[key] = value;
+                    result[key].Add(value);
                 }
             }
 
@@ -112,16 +127,17 @@ namespace intag
                 }
 
                 var parsedArgs = ParseArgs(args);
-                var isWithTagsModificationFlags = parsedArgs.ContainsKey("--add") || parsedArgs.ContainsKey("--remove");
+                var isWithModificationFlags = parsedArgs.ContainsKey("--add") || parsedArgs.ContainsKey("--remove");
                 var isObjectsNotSpecified = !parsedArgs.ContainsKey("--path") && !parsedArgs.ContainsKey("--list");
-                if (isWithTagsModificationFlags && isObjectsNotSpecified && !parsedArgs.ContainsKey("--ui"))
+                if (isWithModificationFlags && isObjectsNotSpecified && !parsedArgs.ContainsKey("--ui"))
                 {
                     ShowUsage();
                     Environment.Exit(1);
                 }
 
-                var objects = parsedArgs.Where(p => p.Key == "--path").Select(p => p.Value);
-                var joinedList = parsedArgs.Where(p => p.Key == "--list").Select(p => p.Value).SelectMany(File.ReadAllLines).ToList();
+                var objects = parsedArgs.TryGetValue("--path", out var paths) ? paths : new List<string>();
+                var listFiles = parsedArgs.TryGetValue("--list", out var lists) ? lists : new List<string>();
+                var joinedList = listFiles.SelectMany(File.ReadAllLines).ToList();
                 joinedList.AddRange(objects);
 
                 var validObjects = joinedList.Where(arg => Directory.Exists(arg) || File.Exists(arg)).ToArray();
@@ -146,29 +162,91 @@ namespace intag
             }
         }
 
-        private static bool HandleCliStart(Dictionary<string, string> parsedArgs, string[] validObjects)
+        private static bool HandleCliStart(Dictionary<string, List<string>> parsedArgs, string[] validObjects)
         {
-            var tagsToAdd = parsedArgs.Where(p => p.Key == "--add").Select(p => p.Value).ToArray();
-            var tagsToRemove = parsedArgs.Where(p => p.Key == "--remove").Select(p => p.Value).ToArray();
-          
-            if (tagsToAdd.Length == 0 && tagsToRemove.Length == 0)
+            var valuesToAdd = parsedArgs.TryGetValue("--add", out var addList) ? addList.ToArray() : Array.Empty<string>();
+            var valuesToRemove = parsedArgs.TryGetValue("--remove", out var removeList) ? removeList.ToArray() : Array.Empty<string>();
+            var propertyName = parsedArgs.TryGetValue("--property", out var propList) && propList.Count > 0
+                ? propList[0]
+                : "tags";  // default to tags/keywords
+
+            var propertyId = Constants.GetPropertyId(propertyName);
+            var isMultiValue = Constants.IsMultiValueProperty(propertyId);
+
+            if (valuesToAdd.Length == 0 && valuesToRemove.Length == 0)
             {
-                var tagsCollection = FileUtils.GetObjectsTags(validObjects);
-                System.Console.WriteLine("Tags for objects:");
-                System.Console.WriteLine(string.Join(Environment.NewLine, tagsCollection.Select(kv => $"{kv.Key}: {string.Join(", ", kv.Value)}")));
+                // Display current values
+                if (isMultiValue)
+                {
+                    var tagsCollection = FileUtils.GetObjectsTags(validObjects);
+                    Console.WriteLine($"{Constants.PropertyIdToDisplayName[propertyId]} for objects:");
+                    Console.WriteLine(string.Join(Environment.NewLine, tagsCollection.Select(kv => $"{kv.Key}: {string.Join(", ", kv.Value)}")));
+                }
+                else
+                {
+                    Console.WriteLine($"{Constants.PropertyIdToDisplayName[propertyId]} for objects:");
+                    foreach (var obj in validObjects)
+                    {
+                        if (File.Exists(obj))
+                        {
+                            var value = FileUtils.GetFileStringProperty(obj, propertyId);
+                            Console.WriteLine($"{obj}: {value}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{obj}: (folders not supported for this property)");
+                        }
+                    }
+                }
                 return false;
             }
-            
-            if (tagsToAdd.Length > 0)
-            {
-                Log("Adding tags: " + string.Join(", ", tagsToAdd));
-                FileUtils.AddTags(validObjects, tagsToAdd);
-            }
 
-            if (tagsToRemove.Length > 0)
+            if (isMultiValue)
             {
-                Log("Removing tags: " + string.Join(", ", tagsToRemove));
-                FileUtils.RemoveTags(validObjects, tagsToRemove);
+                // Multi-value property (tags/keywords) - add/remove behavior
+                if (valuesToAdd.Length > 0)
+                {
+                    Log($"Adding {propertyName}: " + string.Join(", ", valuesToAdd));
+                    FileUtils.AddTags(validObjects, valuesToAdd);
+                }
+
+                if (valuesToRemove.Length > 0)
+                {
+                    Log($"Removing {propertyName}: " + string.Join(", ", valuesToRemove));
+                    FileUtils.RemoveTags(validObjects, valuesToRemove);
+                }
+            }
+            else
+            {
+                // Single-value property - set behavior (--add sets, --remove clears)
+                if (valuesToAdd.Length > 0)
+                {
+                    var valueToSet = string.Join(" ", valuesToAdd);  // Combine if multiple --add
+                    Log($"Setting {propertyName} to: {valueToSet}");
+                    foreach (var obj in validObjects)
+                    {
+                        if (File.Exists(obj))
+                        {
+                            FileUtils.AssignStringPropertyToFile(obj, propertyId, valueToSet);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Warning: {obj} is a folder, property '{propertyName}' not supported for folders");
+                        }
+                    }
+                }
+
+                if (valuesToRemove.Length > 0)
+                {
+                    Log($"Clearing {propertyName}");
+                    foreach (var obj in validObjects)
+                    {
+                        if (File.Exists(obj))
+                        {
+                            FileUtils.AssignStringPropertyToFile(obj, propertyId, string.Empty);
+                        }
+                    }
+                }
             }
 
             return true;
