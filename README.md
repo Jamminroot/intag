@@ -1,6 +1,12 @@
 # InTag
 
-> POLL📢[VERSION v.2 DISCUSSION AND PLANNING](https://github.com/Jamminroot/intag/discussions/29)
+[![Get it from Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download%20v2.0-blue?style=for-the-badge&logo=microsoft)](https://apps.microsoft.com/detail/9pb72s2jq5df?ocid=webpdpshare)
+
+**v2.0 is now available!** A completely rewritten version with extended metadata support, smaller footprint, faster performance, and a fresh new look. New features include quick column visibility toggles, grouping controls, and native modern context menu integration on Windows 11.
+
+[View Release Notes](https://github.com/Jamminroot/intag/releases/latest)
+
+---
 
 InTag is a tool that allows you to add tags to folders and files from the explorer context menu. It can also scan nearby files and use their tags for convenience. The tool is designed to be small and lightweight.
 
