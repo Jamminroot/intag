@@ -2,6 +2,8 @@
 
 InTag is a lightweight tool for tagging files and folders directly from the Windows Explorer context menu. Nearby tags are suggested automatically for quick reuse.
 
+<a href="https://apps.microsoft.com/store/detail/9PB72S2JQ5DF"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/></a>
+
 ## Features
 
 - Tag files and folders from the Explorer context menu
@@ -11,7 +13,9 @@ InTag is a lightweight tool for tagging files and folders directly from the Wind
 - CLI support for scripting and automation
 - Works on Windows 10 and 11
 
-## Usage (UI)
+## Usage
+
+### UI
 
 1. Right-click a folder or file and select InTag.
 
@@ -35,7 +39,7 @@ InTag is a lightweight tool for tagging files and folders directly from the Wind
 
 ![Folder Settings](images/FolderSettings.png)
 
-## Usage (CLI)
+### CLI
 
 ```ps1
 # Add tags:
@@ -49,10 +53,7 @@ InTag is a lightweight tool for tagging files and folders directly from the Wind
 ## Installation
 
 ### Microsoft Store (recommended)
-
-<a href="https://apps.microsoft.com/store/detail/9PB72S2JQ5DF"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/></a>
-
-Updates are handled automatically.
+Install from the [Microsoft Store](https://apps.microsoft.com/store/detail/9PB72S2JQ5DF). Updates are handled automatically.
 
 ### Standalone
 Download the latest release from [GitHub Releases](https://github.com/Jamminroot/intag/releases) and run `intag.exe`. It will register itself automatically on first launch.
@@ -69,8 +70,3 @@ Download the latest release from [GitHub Releases](https://github.com/Jamminroot
 ## Third-Party Notice
 
 The code for individual file management was taken from the Windows API Code Pack.
-
-## Additional Tool
-
-For even better organization, check out Multistack Launcher,
-
