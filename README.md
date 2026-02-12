@@ -59,7 +59,7 @@ Download the latest release and run `intag.exe`. It will register itself automat
 - **Store version**: Uninstall from Windows Settings > Apps, or right-click the app in the Start menu.
 - **Standalone version**: Launch `intag.exe` directly (not from the context menu) and select the Uninstall option, or run with `--uninstall`.
 
-## Contributions
+## Contributions to the legacy version (still grateful)
 
 [montoner0](https://github.com/montoner0) - great PR with bunch of improvements and fixes, also nice suggestions
 
