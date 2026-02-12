@@ -1,4 +1,4 @@
-# InTag
+# Intag: Files & Folders
 
 [![Get it from Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download%20v2.4.29-blue?style=for-the-badge&logo=microsoft)](https://apps.microsoft.com/detail/9pb72s2jq5df?ocid=webpdpshare)
 
@@ -105,4 +105,5 @@ The code for individual file management was taken from the Windows API Code Pack
 ## Additional Tool
 
 For even better organization, check out Multistack Launcher,
+
 
