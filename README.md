@@ -1,8 +1,8 @@
 # InTag
 
-[![Get it from Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download%20v2.0-blue?style=for-the-badge&logo=microsoft)](https://apps.microsoft.com/detail/9pb72s2jq5df?ocid=webpdpshare)
+[![Get it from Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download%20v2.4.29-blue?style=for-the-badge&logo=microsoft)](https://apps.microsoft.com/detail/9pb72s2jq5df?ocid=webpdpshare)
 
-**v2.0 is now available!** A completely rewritten version with extended metadata support, smaller footprint, faster performance, and a fresh new look. New features include quick column visibility toggles, grouping controls, and native modern context menu integration on Windows 11.
+**v2.4 is now available!** A completely rewritten version with extended metadata support, smaller footprint, faster performance, and a fresh new look. New features include quick column visibility toggles, grouping controls, and native modern context menu integration on Windows 11.
 
 [View Release Notes](https://github.com/Jamminroot/intag/releases/latest)
 
@@ -105,3 +105,4 @@ The code for individual file management was taken from the Windows API Code Pack
 ## Additional Tool
 
 For even better organization, check out Multistack Launcher,
+
