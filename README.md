@@ -1,43 +1,39 @@
-# Intag: Files & Folders
+# InTag
 
-[![Get it from Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download%20v2.4.29-blue?style=for-the-badge&logo=microsoft)](https://apps.microsoft.com/detail/9pb72s2jq5df?ocid=webpdpshare)
-
-**v2.4 is now available!** A completely rewritten version with extended metadata support, smaller footprint, faster performance, and a fresh new look. New features include quick column visibility toggles, grouping controls, and native modern context menu integration on Windows 11.
-
-[View Release Notes](https://github.com/Jamminroot/intag/releases/latest)
-
----
-
-InTag is a tool that allows you to add tags to folders and files from the explorer context menu. It can also scan nearby files and use their tags for convenience. The tool is designed to be small and lightweight.
+InTag is a lightweight tool for tagging files and folders directly from the Windows Explorer context menu. Nearby tags are suggested automatically for quick reuse.
 
 ## Features
 
-- Add tags to folders and files from the explorer context menu
-- Scan nearby files and use their tags for convenience
-- Small and lightweight design
-- *NEW* - added support of CLI usage
+- Tag files and folders from the Explorer context menu
+- Multiple metadata properties: Tags, Title, Subject, Author, Comments, Category, Company, Street, and more
+- Suggested tags from nearby files for quick reuse
+- Toggle column visibility and grouping per folder with Ctrl+F / Ctrl+D
+- CLI support for scripting and automation
+- Works on Windows 10 and 11
 
 ## Usage (UI)
 
-To use InTag, follow these steps:
+1. Right-click a folder or file and select InTag.
 
-1. Right-click the folder (on Windows 11, you may need to press ' Show more options'), and select InTag.
+![Context Menu](images/ContextMenu.png)
 
-![Context Menu Example](images/ContextMenu.png)
+2. Assign tags or edit metadata properties. Nearby tags appear as suggestions.
 
-2. Assign the desired tags to a folder (or file, if it supports System.Keywords metadata). The neighboring tags will be included in the list of available tags.
+![Main Window](images/Window.png)
 
-![Main Window Example](images/Window.png)
+3. Press Enter or click away to apply. Press Esc to cancel.
 
-3. Once you have assigned the tags, click back to the folder or press the enter key to apply the changes. The tags will be assigned, but it may take some time for explorer to detect the changes. To cancel press the esc key. 
+![Tagged Folders](images/Result.png)
 
-   NB. The tag input field should be focused and empty for the enter key worked.
+![Tagged Folders](images/Result2.png)
 
-![Tagged Folders Example](images/Result.png)
+4. Right-click the InTag window to access settings: toggle properties, change appearance, and more.
 
-![Tagged Folders Example - 2](images/Result2.png)
+![Properties](images/Properties.png)
 
-4. Ensure that you have enabled grouping by tags by selecting "Context menu on the folder background > group by > More... > Select 'Tags' in the list".
+5. Use Ctrl+F to toggle column visibility or Ctrl+D to toggle grouping for the current property in the parent folder.
+
+![Folder Settings](images/FolderSettings.png)
 
 ## Usage (CLI)
 
@@ -52,47 +48,16 @@ To use InTag, follow these steps:
 
 ## Installation
 
-There are three methods for installing InTag:
+### Microsoft Store (recommended)
+Install directly from the [Microsoft Store](https://apps.microsoft.com/detail/9N4TXKFKSF8K). Updates are handled automatically.
 
-1. Automagical: Start the application once, and it should install itself automatically.
-2. Almost automagical: Right-click the application icon in explorer, and run the application with administrator rights.
-
-![Run as admin](images/RunAsAdmin.png)
-
-3. Manually: Place the .exe file in a directory of your choice, or add a registry entry.
-
-## Registry Entry Snippets
-
-To add the registry entry, use the following code snippets:
-
-For (only) folders:
-```reg
-Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\Folder\shell\InTag]
-"Icon"="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\""
-
-[HKEY_CLASSES_ROOT\Folder\shell\InTag\command]
-@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" --ui --path \"%1\""
-```
-
-For all files:
-```reg
-Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\*\shell\InTag]
-"Icon"="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\""
-
-[HKEY_CLASSES_ROOT\*\shell\InTag\command]
-@="\"C:\\<PUT YOUR PATH HERE>\\intag.exe\" --ui --path \"%1\""
-```
+### Standalone
+Download the latest release and run `intag.exe`. It will register itself automatically on first launch.
 
 ## Uninstall
 
-There are two methods for uninstalling InTag:
-
-1. Via argument: Run the exe file with the `--uninstall` or `-u` argument.
-2. Manually: Remove the `HKEY_CLASSES_ROOT\Folder\shell\InTag` and(or) `HKEY_CLASSES_ROOT\*\shell\InTag` entries.
+- **Store version**: Uninstall from Windows Settings > Apps, or right-click the app in the Start menu.
+- **Standalone version**: Launch `intag.exe` directly (not from the context menu) and select the Uninstall option, or run with `--uninstall`.
 
 ## Contributions
 
@@ -105,5 +70,3 @@ The code for individual file management was taken from the Windows API Code Pack
 ## Additional Tool
 
 For even better organization, check out Multistack Launcher,
-
-
