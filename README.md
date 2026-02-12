@@ -1,4 +1,4 @@
-# InTag
+# Intag: Files and Folders
 
 InTag is a lightweight tool for tagging files and folders directly from the Windows Explorer context menu. Nearby tags are suggested automatically for quick reuse.
 
@@ -70,3 +70,4 @@ The code for individual file management was taken from the Windows API Code Pack
 ## Additional Tool
 
 For even better organization, check out Multistack Launcher,
+
