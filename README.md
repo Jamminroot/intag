@@ -1,4 +1,4 @@
-# Intag: Files and Folders
+# Intag: Files & Folders
 
 InTag is a lightweight tool for tagging files and folders directly from the Windows Explorer context menu. Nearby tags are suggested automatically for quick reuse.
 
@@ -42,17 +42,20 @@ InTag is a lightweight tool for tagging files and folders directly from the Wind
 .\intag.exe --add "test_tag" --path "C:\path\to\folder\or\file"
 # Remove tags:
 .\intag.exe --remove "test_tag" --list "C:\path\to\list\file"
-# Add And Remove tags (will combine files in list file and argument of "--path")::
+# Add And Remove tags (will combine files in list file and argument of "--path"):
 .\intag.exe  --add "test_tag" --remove "test_tag" --list "C:\path\to\list\file" --path "C:\path\to\folder\or\file"
 ```
 
 ## Installation
 
 ### Microsoft Store (recommended)
-Install directly from the [Microsoft Store](https://apps.microsoft.com/detail/9N4TXKFKSF8K). Updates are handled automatically.
+
+<a href="https://apps.microsoft.com/store/detail/9PB72S2JQ5DF"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/></a>
+
+Updates are handled automatically.
 
 ### Standalone
-Download the latest release and run `intag.exe`. It will register itself automatically on first launch.
+Download the latest release from [GitHub Releases](https://github.com/Jamminroot/intag/releases) and run `intag.exe`. It will register itself automatically on first launch.
 
 ## Uninstall
 
