@@ -41,14 +41,55 @@ InTag is a lightweight tool for tagging files and folders directly from the Wind
 
 ### CLI
 
+Tags are the default property. Use `--property` to work with other metadata.
+
 ```ps1
-# Add tags:
-.\intag.exe --add "test_tag" --path "C:\path\to\folder\or\file"
-# Remove tags:
-.\intag.exe --remove "test_tag" --list "C:\path\to\list\file"
-# Add And Remove tags (will combine files in list file and argument of "--path"):
-.\intag.exe  --add "test_tag" --remove "test_tag" --list "C:\path\to\list\file" --path "C:\path\to\folder\or\file"
+# Add tags to a folder:
+intag --add "vacation" --add "2026" --path "C:\Photos\Summer"
+
+# Remove a tag:
+intag --remove "vacation" --path "C:\Photos\Summer"
+
+# View current tags:
+intag --path "C:\Photos\Summer"
+
+# Set the author on a file:
+intag --property author --add "John Doe" --path report.docx
+
+# Set a category:
+intag --property category --add "Work" --path project.docx
+
+# Set a comment:
+intag --property comments --add "Draft version, needs review" --path notes.docx
+
+# Set company:
+intag --property company --add "Acme Corp" --path invoice.docx
+
+# Set street address metadata:
+intag --property street --add "123 Main St" --path contact.docx
+
+# Process multiple files from a list:
+intag --add "archive" --list "C:\files_to_tag.txt"
+
+# Open the UI for specific files:
+intag --ui --path file1.txt --path file2.txt
 ```
+
+#### Available Properties
+
+| Property | CLI name | Type | Explorer Column |
+|----------|----------|------|-----------------|
+| Tags | `tags` (default) | Multi-value | Tags |
+| Title | `title` | Single value | Title |
+| Subject | `subject` | Single value | Subject |
+| Author | `author` | Multi-value | Authors |
+| Comments | `comments` | Free text | Comments |
+| Category | `category` | Multi-value | Categories |
+| Company | `company` | Single value | Company |
+| Street | `street` | Single value | Business Street |
+| Other Street | `otherstreet` | Single value | Other Street |
+
+All properties work with both files and folders, are stored as standard Windows metadata, and are visible in Explorer's column view. Use Ctrl+F in the InTag UI to toggle column visibility, or Ctrl+D to toggle grouping.
 
 ## Installation
 
