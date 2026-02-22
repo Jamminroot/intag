@@ -1,3 +1,7 @@
+## [v2.4.71.0] - 2026-02-22
+
+**Full Changelog**: https://github.com/Jamminroot/intag/compare/2.4.31.0...v2.4.71.0
+
 ## [v2.4.70.0] - 2026-02-22
 
 **Full Changelog**: https://github.com/Jamminroot/intag/compare/2.4.31.0...v2.4.70.0
