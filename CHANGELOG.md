@@ -1,3 +1,10 @@
+## [v2.4.75.0] - 2026-04-17
+
+- Fix changelog generation heredoc in release workflow
+- Preserve existing desktop.ini entries when writing folder metadata
+- Add .pdf to supported file extensions for context menu (fixes #38)
+- Restructure pipelines for 100% manual triggering, rc tagging, and auto-computed changelogs
+
 ## [v2.4.71.0] - 2026-02-22
 
 **Full Changelog**: https://github.com/Jamminroot/intag/compare/2.4.31.0...v2.4.71.0
