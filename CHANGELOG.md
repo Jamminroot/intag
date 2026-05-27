@@ -1,3 +1,7 @@
+## [v2.4.77.0] - 2026-05-27
+
+- Write desktop.ini as UTF-16 LE so Explorer renders non-ASCII correctly
+
 ## [v2.4.75.0] - 2026-04-17
 
 - Fix changelog generation heredoc in release workflow
