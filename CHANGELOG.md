@@ -1,3 +1,16 @@
+## [v2.5.84.0] - 2026-07-31
+
+What's new in v2.5.84.0:
+  Bug Fixes:
+  - report metadata writes that fail instead of failing silently (#43)
+  - remove shell extension from GUI uninstall path (#42)
+  New Features:
+  - write Vorbis comments for .ogg/.oga/.opus (#44)
+  Maintenance:
+  - ci: collapse the two-stage release into a single workflow
+  - docs: correct msix tracking note and record the build-number pitfall
+  - chore: bump display version to 2.5
+
 ## [v2.4.77.0] - 2026-05-27
 
 - Write desktop.ini as UTF-16 LE so Explorer renders non-ASCII correctly
