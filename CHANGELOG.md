@@ -1,3 +1,10 @@
+## [v2.5.87.0] - 2026-08-26
+
+What's new in v2.5.87.0:
+  Bug Fixes:
+  - use the SHCNF flag that actually exists
+  - settings persistence, Explorer refresh, backdrop fallback (#42)
+
 ## [v2.5.84.0] - 2026-07-31
 
 What's new in v2.5.84.0:
