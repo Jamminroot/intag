@@ -2,8 +2,17 @@
 
 What's new in v2.5.87.0:
   Bug Fixes:
-  - use the SHCNF flag that actually exists
-  - settings persistence, Explorer refresh, backdrop fallback (#42)
+  - Fixed settings not persisting when the UI was opened from the Windows 11 context menu. The menu launches
+  InTag with package identity, so registry virtualization redirected its HKCU writes into the package's private
+  hive — invisible to a direct launch of the exe. Tab visibility, theme and transparency choices made from the
+  context menu silently reverted. Registry write virtualization is now disabled in the sparse package manifest.
+  - Fixed Explorer not showing new tags until the search indexer caught up. Tag and property writes now notify the
+  shell directly, so the columns refresh right after saving, for both files and folders.
+  - Fixed the window rendering as a transparent hole on remote desktop sessions and on Windows 11 builds before
+  22621, where the requested DWM backdrop material is not drawn. Those systems now fall back to a solid background.
+
+Note: the context menu registration has to be refreshed for the settings fix to take effect - run InTag and
+reinstall the context menu, or run `intag.exe --install`, after updating.
 
 ## [v2.5.84.0] - 2026-07-31
 
