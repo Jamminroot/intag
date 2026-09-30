@@ -2,6 +2,22 @@
 
 What's new in v2.6.96.0:
   Bug Fixes:
+  - offer the context menu on Ogg and Matroska audio files
+  - scale the UI by monitor DPI (#46)
+  New Features:
+  - add a user zoom level on top of monitor DPI (#46)
+  - let the main window be resized by width (#46)
+  - write Matroska tags into .webm and .mkv (#45)
+  - write XMP tags into .webp files (#45)
+  Maintenance:
+  - chore: bump display version to 2.6
+  - docs: describe the webm writer and correct the format support note
+  - docs: record the DPI rule and the per-format writer status
+
+## [v2.6.96.0] - 2026-09-30
+
+What's new in v2.6.96.0:
+  Bug Fixes:
   - Fixed the window looking tiny on displays that use Windows scaling above 100% (#46). InTag told Windows
   it would scale itself but never did, so on 125% or 150% displays - common on 1080p monitors - it stayed
   small while everything around it grew. It now follows the display's scale and the monitor it opens on.
