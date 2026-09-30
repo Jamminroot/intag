@@ -1,3 +1,29 @@
+## [v2.6.96.0] - 2026-09-30
+
+What's new in v2.6.96.0:
+  Bug Fixes:
+  - Fixed the window looking tiny on displays that use Windows scaling above 100% (#46). InTag told Windows
+  it would scale itself but never did, so on 125% or 150% displays - common on 1080p monitors - it stayed
+  small while everything around it grew. It now follows the display's scale and the monitor it opens on.
+  - Fixed the InTag context menu entry missing on .ogg, .oga and .opus files. Ogg tagging arrived in 2.5,
+  but these extensions were never registered for the context menu, so on Store installs there was no way
+  to open InTag on them from Explorer.
+  New Features:
+  - Added tagging support for WebP images (#45). Windows reads tags from .webp files but refuses to write
+  them, which is why tags used to disappear. InTag now writes the XMP metadata block itself, and Explorer
+  shows the result directly: Tags, Title and Authors are supported. Other properties are not surfaced by
+  Windows for this format and are reported as failures instead of being silently dropped.
+  - Added tagging support for WebM and MKV video, plus MKA and WEBA audio (#45). As with WebP, Windows
+  reads Matroska tags but cannot write them; InTag now writes them itself. Tags, Title and Comments are
+  supported, and existing metadata such as per-track durations is preserved.
+  - Added a zoom setting (#46): Appearance > Zoom offers 100% to 200%, or use Ctrl+= and Ctrl+- in the
+  window. The window, the right-click menu and the dialogs all scale together, and the choice is remembered.
+  - The window can now be resized horizontally by dragging its left or right edge, and its width is
+  remembered between sessions (#46).
+
+Note: GIF files still cannot be tagged. Windows neither writes nor reads metadata for GIF, so tags written
+by any tool would stay invisible in Explorer.
+
 ## [v2.5.87.0] - 2026-08-26
 
 What's new in v2.5.87.0:
